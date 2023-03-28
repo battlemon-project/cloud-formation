@@ -10,10 +10,6 @@ env:
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
-description:
-  This workflow is used to deploy a sample application to AWS CloudFormation.
-  It uses the AWS CloudFormation GitHub Action to deploy the application.
-  The workflow is triggered on push to the master branch.
 jobs:
   cloudformation_deploy:
     runs-on: ubuntu-latest

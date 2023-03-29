@@ -30,7 +30,7 @@ Resources:
       VpcId: !Ref BattlemonVPC
       InternetGatewayId: !Ref InternetGateway
 
-  PublicSubnetA:
+  PublicSubnet-A:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -41,7 +41,7 @@ Resources:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Public", "A" ] ]
 
-  PublicSubnetB:
+  PublicSubnet-B:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -52,7 +52,7 @@ Resources:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Public", "B" ] ]
 
-  PrivateSubnetA:
+  PrivateSubnet-A:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -63,7 +63,7 @@ Resources:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Private", "A" ] ]
 
-  PrivateSubnetB:
+  PrivateSubnet-B:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -74,6 +74,30 @@ Resources:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Private", "B" ] ]
 
+  NatGatewayEIP-A:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGatewayEIP-B:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway-A:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP-A.AllocationId
+      SubnetId: !Ref PublicSubnet-A
+
+  NatGateway-B:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP-B.AllocationId
+      SubnetId: !Ref PublicSubnet-B
+
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -82,10 +106,22 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}PublicRoutes
 
-  DefaultPublicRoute:
+  InternetGatewayPublicRoute:
     Type: AWS::EC2::Route
     DependsOn: InternetGatewayAttachment
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
+
+  PublicSubnet-A-RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet-A
+
+  PublicSubnet-B-RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet-B

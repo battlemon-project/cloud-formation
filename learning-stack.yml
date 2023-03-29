@@ -30,7 +30,7 @@ Resources:
       VpcId: !Ref BattlemonVPC
       InternetGatewayId: !Ref InternetGateway
 
-  PublicSubnet-A:
+  PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -39,9 +39,9 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Join [ "-", [ !Ref StackAlias, "Public", "A" ] ]
+          Value: !Join [ "", [ !Ref StackAlias, "Public", "1" ] ]
 
-  PublicSubnet-B:
+  PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -50,9 +50,9 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Join [ "-", [ !Ref StackAlias, "Public", "B" ] ]
+          Value: !Join [ "", [ !Ref StackAlias, "Public", "2" ] ]
 
-  PrivateSubnet-A:
+  PrivateSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -61,9 +61,9 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Join [ "-", [ !Ref StackAlias, "Private", "A" ] ]
+          Value: !Join [ "", [ !Ref StackAlias, "Private", "1" ] ]
 
-  PrivateSubnet-B:
+  PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -72,31 +72,31 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Join [ "-", [ !Ref StackAlias, "Private", "B" ] ]
+          Value: !Join [ "", [ !Ref StackAlias, "Private", "2" ] ]
 
-  NatGatewayEIP-A:
+  NatGatewayEIP1:
     Type: AWS::EC2::EIP
     DependsOn: InternetGatewayAttachment
     Properties:
       Domain: vpc
 
-  NatGatewayEIP-B:
+  NatGatewayEIP2:
     Type: AWS::EC2::EIP
     DependsOn: InternetGatewayAttachment
     Properties:
       Domain: vpc
 
-  NatGateway-A:
+  NatGateway1:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !GetAtt NatGatewayEIP-A.AllocationId
-      SubnetId: !Ref PublicSubnet-A
+      AllocationId: NatGatewayEIP1
+      SubnetId: PublicSubnet1
 
-  NatGateway-B:
+  NatGateway2:
     Type: AWS::EC2::NatGateway
     Properties:
-      AllocationId: !GetAtt NatGatewayEIP-B.AllocationId
-      SubnetId: !Ref PublicSubnet-B
+      AllocationId: NatGatewayEIP2
+      SubnetId: PublicSubnet2
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -118,10 +118,10 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref PublicSubnet-A
+      SubnetId: PublicSubnet1
 
   PublicSubnet-B-RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: !Ref PublicSubnet-B
+      SubnetId: PublicSubnet2

@@ -23,6 +23,7 @@ jobs:
 
       - name: Deploy stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
+        on_failure: DELETE
         with:
           name: learning-stack
           template: learning-stack.yml

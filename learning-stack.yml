@@ -1,5 +1,5 @@
 Resources:
-  myVPC:
+  BattlemonVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
@@ -7,4 +7,12 @@ Resources:
       EnableDnsHostnames: false
       Tags:
         - Key: stack
-          Value: production
+          Value: learning
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    DependsOn: BattlemonVPC
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref BattlemonVPC
+      InternetGatewayId: !Ref InternetGateway

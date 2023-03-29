@@ -90,13 +90,13 @@ Resources:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: NatGatewayEIP1
-      SubnetId: PublicSubnet1
+      SubnetId: !Ref PublicSubnet1
 
   NatGateway2:
     Type: AWS::EC2::NatGateway
     Properties:
       AllocationId: NatGatewayEIP2
-      SubnetId: PublicSubnet2
+      SubnetId: !Ref PublicSubnet2
 
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
@@ -118,10 +118,10 @@ Resources:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: PublicSubnet1
+      SubnetId: !Ref PublicSubnet1
 
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref PublicRouteTable
-      SubnetId: PublicSubnet2
+      SubnetId: !Ref PublicSubnet2

@@ -35,7 +35,8 @@ Resources:
     Properties:
       VpcId: !Ref BattlemonVPC
       CidrBlock: 10.0.10.0/24
-      AvailabilityZone: !Select [ 0, Fn::GetAZs: !Ref "AWS::Region" ]
+      AvailabilityZone: !Select [ 0, !GetAZs  "" ]
+      MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Public", "A" ] ]
@@ -45,7 +46,8 @@ Resources:
     Properties:
       VpcId: !Ref BattlemonVPC
       CidrBlock: 10.0.20.0/24
-      AvailabilityZone: !Select [ 1, Fn::GetAZs: !Ref "AWS::Region" ]
+      AvailabilityZone: !Select [ 1, !GetAZs  "" ]
+      MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Public", "B" ] ]
@@ -55,7 +57,8 @@ Resources:
     Properties:
       VpcId: !Ref BattlemonVPC
       CidrBlock: 10.0.50.0/24
-      AvailabilityZone: !Select [ 0, Fn::GetAZs: !Ref "AWS::Region" ]
+      AvailabilityZone: !Select [ 0, !GetAZs  "" ]
+      MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Private", "A" ] ]
@@ -65,7 +68,8 @@ Resources:
     Properties:
       VpcId: !Ref BattlemonVPC
       CidrBlock: 10.0.60.0/24
-      AvailabilityZone: !Select [ 1, Fn::GetAZs: !Ref "AWS::Region" ]
+      AvailabilityZone: !Select [ 1, !GetAZs  "" ]
+      MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Private", "B" ] ]

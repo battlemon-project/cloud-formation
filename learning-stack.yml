@@ -159,7 +159,7 @@ Resources:
   DefaultPrivateRoute2:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable1
+      RouteTableId: !Ref PrivateRouteTable2
       DestinationIpv6CidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway2
 

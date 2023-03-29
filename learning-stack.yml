@@ -4,6 +4,7 @@ Parameters:
   StackAlias:
     Description: Alias of the stack
     Type: String
+    Default: LearningStack
 
 Description:
   this is template for learning purposes. will be change to production ready later

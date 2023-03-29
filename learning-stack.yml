@@ -1,13 +1,13 @@
 AWSTemplateFormatVersion: "2010-09-09"
 
+Description:
+  this is template for learning purposes. will be change to production ready later
+
 Parameters:
   StackAlias:
     Description: Alias of the stack
     Type: String
     Default: LearningStack
-
-Description:
-  this is template for learning purposes. will be change to production ready later
 
 Resources:
   BattlemonVPC:
@@ -39,3 +39,33 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Public", "A" ] ]
+
+  PublicSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref BattlemonVPC
+      CidrBlock: 10.1.20.0/24
+      AvailabilityZone: !Select [ 0, Fn::GetAZs: !Ref "AWS::Region" ]
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref StackAlias, "Public", "B" ] ]
+
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref BattlemonVPC
+      CidrBlock: 10.1.50.0/24
+      AvailabilityZone: !Select [ 0, Fn::GetAZs: !Ref "AWS::Region" ]
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref StackAlias, "Private", "A" ] ]
+
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref BattlemonVPC
+      CidrBlock: 10.1.60.0/24
+      AvailabilityZone: !Select [ 0, Fn::GetAZs: !Ref "AWS::Region" ]
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref StackAlias, "Private", "B" ] ]

@@ -21,13 +21,12 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: arn:aws:iam::941572822749:role/cloud-formation-github-actions
-          role-session-name: samplerolesession
+          role-session-name: cloudformation-github-actions-deploy
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy to AWS CloudFormation
+      - name: Deploy stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: learning-stack
           template: learning-stack.yml
           no-fail-on-empty-changeset: "1"
-#          parameter-overrides: "EC2InstanceType=t2.micro"

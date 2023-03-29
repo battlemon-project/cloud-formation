@@ -69,3 +69,4 @@ Resources:
       Tags:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Private", "B" ] ]
+

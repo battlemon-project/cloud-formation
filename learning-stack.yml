@@ -24,7 +24,7 @@ Resources:
     Type: AWS::EC2::InternetGateway
     DependsOn: BattlemonVPC
 
-  AttachGateway:
+  InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref BattlemonVPC
@@ -74,3 +74,18 @@ Resources:
         - Key: Name
           Value: !Join [ "-", [ !Ref StackAlias, "Private", "B" ] ]
 
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref BattlemonVPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}PublicRoutes
+
+  DefaultPublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway

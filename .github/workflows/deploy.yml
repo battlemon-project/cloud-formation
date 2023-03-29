@@ -17,6 +17,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
+          on_failure: "DELETE"
           role-to-assume: arn:aws:iam::941572822749:role/cloud-formation-github-actions
           role-session-name: cloudformation-github-actions-deploy
           aws-region: ${{ env.AWS_REGION }}
@@ -27,4 +28,3 @@ jobs:
           name: learning-stack
           template: learning-stack.yml
           no-fail-on-empty-changeset: "1"
-          on_failure: "DELETE"

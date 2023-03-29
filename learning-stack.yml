@@ -1,3 +1,13 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  StackAlias:
+    Description: Alias of the stack
+    Type: String
+
+Description:
+  this is template for learning purposes. will be change to production ready later
+
 Resources:
   BattlemonVPC:
     Type: AWS::EC2::VPC
@@ -8,11 +18,23 @@ Resources:
       Tags:
         - Key: stack
           Value: learning
+
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     DependsOn: BattlemonVPC
+
   AttachGateway:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref BattlemonVPC
       InternetGatewayId: !Ref InternetGateway
+
+  PublicSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref BattlemonVPC
+      CidrBlock: 10.1.10.0/24
+      AvailabilityZone: !Select [ 0, !GetAZ Ref: "AWS::Region" ]
+      Tags:
+        - Key: Name
+          Value: !Join [ "-", [ !Ref StackAlias, "Public", "A" ] ]

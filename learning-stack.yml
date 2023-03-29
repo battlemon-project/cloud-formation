@@ -138,7 +138,7 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable1
-      DestinationIpv6CidrBlock: 0.0.0.0/0
+      DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway1
 
   PrivateSubnet1RouteTableAssociation:
@@ -160,7 +160,7 @@ Resources:
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref PrivateRouteTable2
-      DestinationIpv6CidrBlock: 0.0.0.0/0
+      DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway2
 
   PrivateSubnet2RouteTableAssociation:

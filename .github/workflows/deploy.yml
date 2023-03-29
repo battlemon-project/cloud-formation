@@ -26,4 +26,3 @@ jobs:
         with:
           name: learning-stack
           template: learning-stack.yml
-          no-fail-on-empty-changeset: "1"

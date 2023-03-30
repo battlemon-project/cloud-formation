@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: 2010-09-09
 
 Description:
   this is template for learning purposes. will be change to production ready later
@@ -9,6 +9,11 @@ Parameters:
     Type: String
     Default: LearningStack
 
+  VPCAlias:
+    Description: Alias of the VPC
+    Type: String
+    Default: !Sub ${StackAlias}VPC
+
 Resources:
   BattlemonVPC:
     Type: AWS::EC2::VPC
@@ -17,8 +22,8 @@ Resources:
       EnableDnsSupport: false
       EnableDnsHostnames: false
       Tags:
-        - Key: stack
-          Value: learning
+        - Key: Name
+          Value: !Ref VPCAlias
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
@@ -39,7 +44,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Join [ "", [ !Ref StackAlias, "Public", "1" ] ]
+          Value: !Sub ${VPCAlias}PublicSubnet1
 
   PublicSubnet2:
     Type: AWS::EC2::Subnet
@@ -50,7 +55,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Join [ "", [ !Ref StackAlias, "Public", "2" ] ]
+          Value: !Sub ${StackAlias}PublicSubnet2
 
   PrivateSubnet1:
     Type: AWS::EC2::Subnet
@@ -61,7 +66,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Join [ "", [ !Ref StackAlias, "Private", "1" ] ]
+          Value: !Sub ${StackAlias}PrivateSubnet1
 
   PrivateSubnet2:
     Type: AWS::EC2::Subnet
@@ -72,7 +77,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Join [ "", [ !Ref StackAlias, "Private", "2" ] ]
+          Value: !Sub ${StackAlias}PrivateSubnet2
 
   NatGatewayEIP1:
     Type: AWS::EC2::EIP

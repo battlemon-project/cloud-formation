@@ -84,7 +84,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${VPCAlias}PublicSubnet1
+          Value: !Sub ${StackAlias}PublicSubnet1
 
   PublicSubnet2:
     Type: AWS::EC2::Subnet

@@ -214,12 +214,16 @@ Resources:
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable database access on port 5432
+      GroupDescription: Enable database access on port 5432 only from Private Subnets 2 and 3
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 5432
           ToPort: 5432
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref PrivateSubnet2CIDR
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: !Ref PrivateSubnet3CIDR
       VpcId: !Ref VPC
       Tags:
         - Key: Name
@@ -267,16 +271,15 @@ Resources:
   DefaultPrivateRoute1:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable1
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway1
+      RouteTableId: !Ref PrivateRouteTable1
 
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref PrivateRouteTable1
       SubnetId: !Ref PrivateSubnet1
-
+      RouteTableId: !Ref PrivateRouteTable1
 
   PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
@@ -299,11 +302,13 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
-#  DatabaseSubnetGroup:
-#    Type: AWS::RDS::DBSubnetGroup
-#    Properties:
-#      DBSubnetGroupDescription: Subnet group for RDS database
-#      SubnetIds:
-#      Tags:
-#        - Key: Name
-#          Value: !Sub ${StackAlias}DatabaseSubnetGroup
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS database
+      SubnetIds:
+        - !Ref PrivateSubnet3
+        - !Ref PrivateSubnet4
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}DatabaseSubnetGroup

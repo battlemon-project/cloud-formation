@@ -332,4 +332,4 @@ Resources:
       Port: 5432
       PubliclyAccessible: false
       StorageEncrypted: false
-      VPCSecurityGroups: !Ref DatabaseSecurityGroup
+      VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]

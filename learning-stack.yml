@@ -293,11 +293,11 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
-  DatabaseSubnetGroup:
-    Type: AWS::RDS::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: Subnet group for RDS database
-      SubnetIds:
-      Tags:
-        - Key: Name
-          Value: !Sub ${StackAlias}DatabaseSubnetGroup
+#  DatabaseSubnetGroup:
+#    Type: AWS::RDS::DBSubnetGroup
+#    Properties:
+#      DBSubnetGroupDescription: Subnet group for RDS database
+#      SubnetIds:
+#      Tags:
+#        - Key: Name
+#          Value: !Sub ${StackAlias}DatabaseSubnetGroup

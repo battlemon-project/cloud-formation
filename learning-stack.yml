@@ -1,7 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 
+
 Description:
   this is template for learning purposes. will be change to production ready later
+
 
 Parameters:
   StackAlias:
@@ -9,34 +11,77 @@ Parameters:
     Type: String
     Default: LearningStack
 
+  VpcCIDR:
+    Description: CIDR block for the VPC
+    Type: String
+    Default: 10.0.0.0/16
+
+  PublicSubnet1CIDR:
+    Description: CIDR block for the public subnet 1 in AZ1
+    Type: String
+    Default: 10.0.0.0/24
+
+  PublicSubnet2CIDR:
+    Description: CIDR block for the public subnet 2 in AZ2
+    Type: String
+    Default: 10.0.1.0/24
+
+  PrivateSubnet1CIDR:
+    Description: CIDR block for the private subnet 1 in AZ1
+    Type: String
+    Default: 10.0.2.0/24
+
+  PrivateSubnet2CIDR:
+    Description: CIDR block for the private subnet 2 in AZ2
+    Type: String
+    Default: 10.0.3.0/24
+
+  PrivateSubnet3CIDR:
+    Description: CIDR block for the private subnet 3 in AZ1
+    Type: String
+    Default: 10.0.4.0/24
+
+  PrivateSubnet4CIDR:
+    Description: CIDR block for the private subnet 4 in AZ2
+    Type: String
+    Default: 10.0.5.0/24
+
+
 Resources:
-  BattlemonVPC:
+  VPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: 10.0.0.0/16
-      EnableDnsSupport: false
-      EnableDnsHostnames: false
+      CidrBlock: !Ref VpcCIDR
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}VPC
 
+  # Internet Gateway
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-    DependsOn: BattlemonVPC
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}InternetGateway
 
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
+    DependsOn: VPC
     Properties:
-      VpcId: !Ref BattlemonVPC
       InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref VPC
 
+  # Public Subnets
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref BattlemonVPC
-      CidrBlock: 10.0.10.0/24
       AvailabilityZone: !Select [ 0, !GetAZs  "" ]
+      CidrBlock: !Ref PublicSubnet1CIDR
       MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${VPCAlias}PublicSubnet1
@@ -44,64 +89,18 @@ Resources:
   PublicSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref BattlemonVPC
-      CidrBlock: 10.0.20.0/24
       AvailabilityZone: !Select [ 1, !GetAZs  "" ]
+      CidrBlock: !Ref PublicSubnet2CIDR
       MapPublicIpOnLaunch: true
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}PublicSubnet2
 
-  PrivateSubnet1:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref BattlemonVPC
-      CidrBlock: 10.0.50.0/24
-      AvailabilityZone: !Select [ 0, !GetAZs  "" ]
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: !Sub ${StackAlias}PrivateSubnet1
-
-  PrivateSubnet2:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref BattlemonVPC
-      CidrBlock: 10.0.60.0/24
-      AvailabilityZone: !Select [ 1, !GetAZs  "" ]
-      MapPublicIpOnLaunch: false
-      Tags:
-        - Key: Name
-          Value: !Sub ${StackAlias}PrivateSubnet2
-
-  NatGatewayEIP1:
-    Type: AWS::EC2::EIP
-    DependsOn: InternetGatewayAttachment
-    Properties:
-      Domain: vpc
-
-  NatGatewayEIP2:
-    Type: AWS::EC2::EIP
-    DependsOn: InternetGatewayAttachment
-    Properties:
-      Domain: vpc
-
-  NatGateway1:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatGatewayEIP1.AllocationId
-      SubnetId: !Ref PublicSubnet1
-
-  NatGateway2:
-    Type: AWS::EC2::NatGateway
-    Properties:
-      AllocationId: !GetAtt NatGatewayEIP2.AllocationId
-      SubnetId: !Ref PublicSubnet2
-
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref BattlemonVPC
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}PublicRoutes
@@ -126,10 +125,135 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet2
 
+  # Private Subnets
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs  "" ]
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet1CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}PrivateSubnet1
+        - Key: Tier
+          Value: Backend
+
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 1, !GetAZs  "" ]
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet2CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}PrivateSubnet2
+        - Key: Tier
+          Value: Backend
+
+  PrivateSubnet3:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 0, !GetAZs  "" ]
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet3CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}PrivateSubnet3
+        - Key: Tier
+          Value: Database
+
+  PrivateSubnet4:
+    Type: AWS::EC2::Subnet
+    Properties:
+      AvailabilityZone: !Select [ 1, !GetAZs  "" ]
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PrivateSubnet4CIDR
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}PrivateSubnet4
+        - Key: Tier
+          Value: Database
+
+  # Security groups
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP and HTTPS access on port 80/443
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}ALBSecurityGroup
+
+  WebServerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP access via ALB on port 8000
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}WebServerSecurityGroup
+
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable database access on port 5432
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 0.0.0.0/0
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}DatabaseSecurityGroup
+
+  # Nat gateways
+  NatGatewayEIP1:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGatewayEIP2:
+    Type: AWS::EC2::EIP
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      Domain: vpc
+
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP1.AllocationId
+      SubnetId: !Ref PublicSubnet1
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP2.AllocationId
+      SubnetId: !Ref PublicSubnet2
+
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref BattlemonVPC
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}PrivateRoutes (AZ1)
@@ -151,7 +275,7 @@ Resources:
   PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
     Properties:
-      VpcId: !Ref BattlemonVPC
+      VpcId: !Ref VPC
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}PrivateRoutes (AZ2)
@@ -168,3 +292,12 @@ Resources:
     Properties:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS database
+      SubnetIds:
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}DatabaseSubnetGroup

@@ -342,7 +342,7 @@ Resources:
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub ${StackAlias}ApplicationLoadBalancer
+      Name: !Sub ${StackAlias}ALB
       SecurityGroups: [ !Ref ALBSecurityGroup ]
       Subnets: [ !Ref PublicSubnet1, !Ref PublicSubnet2 ]
 

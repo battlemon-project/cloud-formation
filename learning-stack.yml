@@ -320,7 +320,7 @@ Resources:
       AllocatedStorage: 20
       AvailabilityZone: !Select [ 0, !GetAZs  "" ]
       BackupRetentionPeriod: 0
-      DBInstanceClass: db.t2.micro
+      DBInstanceClass: db.m6i.large
       DBInstanceIdentifier: !Sub ${StackAlias}DatabaseInstance
       DBName: postgres
       DBSubnetGroupName: !Ref DatabaseSubnetGroup

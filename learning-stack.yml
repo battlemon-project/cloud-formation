@@ -302,6 +302,7 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable2
       SubnetId: !Ref PrivateSubnet2
 
+  # Database
   DatabaseSubnetGroup:
     Type: AWS::RDS::DBSubnetGroup
     Properties:
@@ -312,3 +313,23 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}DatabaseSubnetGroup
+
+  DatabaseInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      AvailabilityZone: !Select [ 0, !GetAZs  "" ]
+      BackupRetentionPeriod: 0
+      DBInstanceClass: db.t2.micro
+      DBInstanceIdentifier: !Sub ${StackAlias}DatabaseInstance
+      DBName: postgres
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      Engine: postgres
+      EngineVersion: 15.2
+      MasterUsername: postgres
+      MasterUserPassword: postgres
+      MultiAZ: false
+      Port: 5432
+      PubliclyAccessible: false
+      StorageEncrypted: false
+      VPCSecurityGroups: !Ref DatabaseSecurityGroup

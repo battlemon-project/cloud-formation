@@ -382,7 +382,7 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       Matcher:
-        HttpCode: [ 200, 302 ]
+        HttpCode: 200, 302
       Name: !Sub ${StackAlias}WebServers
       Port: 80
       Protocol: HTTP

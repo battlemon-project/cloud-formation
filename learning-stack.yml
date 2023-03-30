@@ -9,11 +9,6 @@ Parameters:
     Type: String
     Default: LearningStack
 
-  VPCAlias:
-    Description: Alias of the VPC
-    Type: String
-    Default: !Sub ${StackAlias}VPC
-
 Resources:
   BattlemonVPC:
     Type: AWS::EC2::VPC
@@ -23,7 +18,7 @@ Resources:
       EnableDnsHostnames: false
       Tags:
         - Key: Name
-          Value: !Ref VPCAlias
+          Value: !Sub ${StackAlias}VPC
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway

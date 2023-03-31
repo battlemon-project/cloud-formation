@@ -405,25 +405,39 @@ Resources:
       VpcId:
         !Ref VPC
 
-#  # Containers definitions
-#  GraphQLBackendContainerDefinition:
-#    Type: AWS::ECS::TaskDefinition
-#    Properties:
-#      Family: !Sub ${StackAlias}GraphQLBackend
-#      ContainerDefinitions:
-#        - Name: !Sub ${StackAlias}GraphQLBackend
-#          Image: !Ref GraphQLECRRepositoryURI
-#          Essential: true
-#          RuntimePlatform:
-#            CpuArchitecture: ARM64
-#          PortMappings:
-#            - ContainerPort: 8000
-#              Protocol: tcp
-#          CPU: 0
-#          Memory: 1 GB
-#          Environment:
-#            - Name: MY_ENV_VAR
-#              Value: my-value
-#      Tags:
-#        - Key: Name
-#          Value: !Sub ${StackAlias}GraphQLBackendContainerDefinition
+  # Containers definitions
+  GraphQLBackendContainerDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub ${StackAlias}GraphQLBackend
+      ContainerDefinitions:
+        - Name: !Sub ${StackAlias}GraphQLBackend
+          Image: !Ref GraphQLECRRepositoryURI
+          Essential: true
+          RuntimePlatform:
+            CpuArchitecture: ARM64
+          PortMappings:
+            - ContainerPort: 8000
+              Protocol: tcp
+          CPU: 0
+          Memory: 1 GB
+          Environment:
+            - Name: APP_GRAPHQL__PLAYGROUND_ROUTE
+              Value: /graphql/playground
+            - Name: APP_APP__HOST
+              Value: 127.0.0.1
+            - Name: APP_DB__USERNAME
+              Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
+            - Name: APP_DB__PASSWORD
+              Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
+            - Name: APP_APP__PORT
+              Value: '8000'
+            - Name: APP_DB__HOST
+              Value: !GetAtt DatabaseInstance.Endpoint.Address
+            - Name: APP_DB__DB_NAME
+              Value: postgres
+            - Name: APP_DB__PORT
+              Value: '5432'
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}GraphQLBackendContainerDefinition

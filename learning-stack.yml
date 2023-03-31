@@ -393,7 +393,7 @@ Resources:
   GraphQLBackendECRRepository:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: GraphQLBackend
+      RepositoryName: graphql-backend
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackend

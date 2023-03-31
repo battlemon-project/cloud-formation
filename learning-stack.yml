@@ -405,8 +405,8 @@ Resources:
       VpcId:
         !Ref VPC
 
-  # Containers definitions
-  GraphQLBackendContainerDefinition:
+  # Task definitions
+  GraphQLBackendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: !Sub ${StackAlias}GraphQLBackend

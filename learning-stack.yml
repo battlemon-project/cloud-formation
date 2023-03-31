@@ -438,4 +438,4 @@ Resources:
               Value: '5432'
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}GraphQLBackendContainerDefinition
+          Value: !Sub ${StackAlias}GraphQLBackendTaskDefinition

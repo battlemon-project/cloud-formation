@@ -216,7 +216,7 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}ALBSecurityGroup
 
-  WebServerSecurityGroup:
+  GraphQLServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Enable HTTP access via ALB on port 8000
@@ -228,7 +228,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}WebServerSecurityGroup
+          Value: !Sub ${StackAlias}GraphQLSecurityGroup
 
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -389,23 +389,22 @@ Resources:
   #      Port: 443
   #      Protocol: HTTPS
 
-  #  ALBTargetGroup:
-  #    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-  #    Properties:
-  #      HealthCheckIntervalSeconds: 10
-  #      HealthCheckPath: /healthcheck
-  #      HealthCheckTimeoutSeconds: 5
-  #      HealthyThresholdCount: 2
-  #      Matcher:
-  #        HttpCode: "200,302"
-  #      Name: !Sub ${StackAlias}WebServers
-  #      Port: 80
-  #      Protocol: HTTP
-  #      TargetType:
-  #
-  #      UnhealthyThresholdCount: 5
-  #      VpcId:
-  #        !Ref VPC
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /healthcheck
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200,302"
+      Name: !Sub ${StackAlias}WebServers
+      Port: 80
+      Protocol: HTTP
+      #      TargetType:
+      UnhealthyThresholdCount: 5
+      VpcId:
+        !Ref VPC
 
   # Cluster
   BackendCluster:
@@ -427,28 +426,27 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendCluster
 
-  #  GraphQLBackendService:
-  #    Type: AWS::ECS::Service
-  #    Properties:
-  #      ServiceName: !Sub ${StackAlias}GraphQLBackendService
-  #      Cluster: !Ref GraphQLBackendCluster
-  #      TaskDefinition: !Ref GraphQLBackendTaskDefinition
-  #      DesiredCount: 1
-  #      LaunchType: FARGATE
-  #      NetworkConfiguration:
-  #        AwsvpcConfiguration:
-  #          AssignPublicIp: DISABLED
-  #          Subnets: !Ref PrivateSubnets
-  #          SecurityGroups: [ !Ref ServiceSecurityGroup ]
-  #      LoadBalancers:
-  #        - ContainerName: !Sub ${StackAlias}GraphQLBackend
-  #          ContainerPort: 8000
-  #          TargetGroupArn: !Ref ServiceTargetGroup
-  #      Tags:
-  #        - Key: Name
-  #          Value: !Sub ${StackAlias}GraphQLBackendService
+  GraphQLBackendService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub ${StackAlias}GraphQLBackendService
+      Cluster: !Ref BackendCluster
+      TaskDefinition: !Ref GraphQLBackendTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: !Ref PrivateSubnet1
+          SecurityGroups: [ !Ref ServiceSecurityGroup ]
+      LoadBalancers:
+        - ContainerName: !Sub ${StackAlias}GraphQLBackend
+          ContainerPort: 8000
+          TargetGroupArn: !Ref ALBTargetGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}GraphQLBackendService
 
-  # Task definitions
   GraphQLBackendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:

@@ -60,6 +60,11 @@ Parameters:
     Type: Number
     Default: 8000
 
+  RDSPort:
+    Description: GraphQL backend port
+    Type: Number
+    Default: 5432
+
 Resources:
   # Secrets
   RDSSecret:

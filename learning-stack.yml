@@ -427,26 +427,26 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendCluster
 
-#  GraphQLBackendService:
-#    Type: AWS::ECS::Service
-#    Properties:
-#      ServiceName: !Sub ${StackAlias}GraphQLBackendService
-#      Cluster: !Ref GraphQLBackendCluster
-#      TaskDefinition: !Ref GraphQLBackendTaskDefinition
-#      DesiredCount: 1
-#      LaunchType: FARGATE
-#      NetworkConfiguration:
-#        AwsvpcConfiguration:
-#          AssignPublicIp: DISABLED
-#          Subnets: !Ref PrivateSubnets
-#          SecurityGroups: [ !Ref ServiceSecurityGroup ]
-#      LoadBalancers:
-#        - ContainerName: !Sub ${StackAlias}GraphQLBackend
-#          ContainerPort: 8000
-#          TargetGroupArn: !Ref ServiceTargetGroup
-#      Tags:
-#        - Key: Name
-#          Value: !Sub ${StackAlias}GraphQLBackendService
+  #  GraphQLBackendService:
+  #    Type: AWS::ECS::Service
+  #    Properties:
+  #      ServiceName: !Sub ${StackAlias}GraphQLBackendService
+  #      Cluster: !Ref GraphQLBackendCluster
+  #      TaskDefinition: !Ref GraphQLBackendTaskDefinition
+  #      DesiredCount: 1
+  #      LaunchType: FARGATE
+  #      NetworkConfiguration:
+  #        AwsvpcConfiguration:
+  #          AssignPublicIp: DISABLED
+  #          Subnets: !Ref PrivateSubnets
+  #          SecurityGroups: [ !Ref ServiceSecurityGroup ]
+  #      LoadBalancers:
+  #        - ContainerName: !Sub ${StackAlias}GraphQLBackend
+  #          ContainerPort: 8000
+  #          TargetGroupArn: !Ref ServiceTargetGroup
+  #      Tags:
+  #        - Key: Name
+  #          Value: !Sub ${StackAlias}GraphQLBackendService
 
   # Task definitions
   GraphQLBackendTaskDefinition:
@@ -460,7 +460,7 @@ Resources:
           PortMappings:
             - ContainerPort: 8000
               Protocol: tcp
-          Cpu: 0
+          Cpu: .5
           Memory: 1024
           Environment:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE

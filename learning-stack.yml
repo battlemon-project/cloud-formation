@@ -460,7 +460,7 @@ Resources:
           PortMappings:
             - ContainerPort: 8000
               Protocol: tcp
-          Cpu: 1024
+          Cpu: 1 vCPU
           Memory: 1 GB
           Environment:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE

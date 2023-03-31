@@ -414,8 +414,6 @@ Resources:
         - Name: !Sub ${StackAlias}GraphQLBackend
           Image: !Ref GraphQLECRRepositoryURI
           Essential: true
-          RuntimePlatform:
-            CpuArchitecture: ARM64
           PortMappings:
             - ContainerPort: 8000
               Protocol: tcp

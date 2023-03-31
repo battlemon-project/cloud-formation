@@ -451,7 +451,7 @@ Resources:
       ServiceName: !Sub ${StackAlias}GraphQLBackendService
       Cluster: !Ref BackendCluster
       TaskDefinition: !Ref GraphQLBackendTaskDefinition
-      DesiredCount: 1
+      DesiredCount: 2
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:

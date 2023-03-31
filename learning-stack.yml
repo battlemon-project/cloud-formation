@@ -460,8 +460,8 @@ Resources:
           PortMappings:
             - ContainerPort: 8000
               Protocol: tcp
-          Cpu: .5
-          Memory: 1024
+          Cpu: 1024
+          Memory: 1 GB
           Environment:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE
               Value: /graphql/playground

@@ -459,6 +459,7 @@ Resources:
     Properties:
       RequiresCompatibilities: [ FARGATE ]
       Family: !Sub ${StackAlias}GraphQLBackend
+      NetworkMode: awsvpc
       ContainerDefinitions:
         - Name: !Sub ${StackAlias}GraphQLBackend
           Image: !Ref GraphQLECRRepositoryURI

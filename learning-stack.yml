@@ -345,8 +345,8 @@ Resources:
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       Engine: postgres
       EngineVersion: 15.2
-      MasterUsername: postgres
-      MasterUserPassword: postgres
+      MasterUsername: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
       MultiAZ: false
       Port: 5432
       PubliclyAccessible: false

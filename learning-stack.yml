@@ -248,11 +248,11 @@ Resources:
         - IpProtocol: tcp
           FromPort: !Ref RDSPort
           ToPort: !Ref RDSPort
-          CidrIp: !Ref PrivateSubnet2CIDR
+          CidrIp: !Ref PrivateSubnet1CIDR
         - IpProtocol: tcp
           FromPort: !Ref RDSPort
           ToPort: !Ref RDSPort
-          CidrIp: !Ref PrivateSubnet3CIDR
+          CidrIp: !Ref PrivateSubnet2CIDR
       VpcId: !Ref VPC
       Tags:
         - Key: Name
@@ -304,6 +304,13 @@ Resources:
       NatGatewayId: !Ref NatGateway1
       RouteTableId: !Ref PrivateRouteTable1
 
+  #  PrivateSubnet1ToPrivateSubnet3Route:
+  #    Type: AWS::EC2::Route
+  #    Properties:
+  #      DestinationCidrBlock: !Ref PrivateSubnet3CIDR
+  #      RouteTableId: !Ref PrivateRouteTable1
+  #      NetworkInterfaceId: !GetAtt PrivateSubnet3.NetworkInterfaceId
+
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -337,8 +344,8 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Subnet group for RDS database
       SubnetIds:
-        - !Ref PrivateSubnet3
-        - !Ref PrivateSubnet4
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}DatabaseSubnetGroup
@@ -361,7 +368,6 @@ Resources:
       Port: !Ref RDSPort
       PubliclyAccessible: false
       StorageEncrypted: false
-
       VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]
 
   # Application Load Balancer

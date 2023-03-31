@@ -50,7 +50,6 @@ Parameters:
 #    Description: The ARN of the AWS Certificate Manager (ACM) certificate to use for the load balancer
 #    Type: String
 
-
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -394,6 +393,22 @@ Resources:
     Type: AWS::ECR::Repository
     Properties:
       RepositoryName: graphql-backend
+      RepositoryPolicyText:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowPushPull
+            Effect: Allow
+            Condition:
+              StringEquals:
+                "aws:SourceAccount": !Ref AWS::AccountId
+            Action:
+              - "ecr:GetDownloadUrlForLayer"
+              - "ecr:BatchGetImage"
+              - "ecr:BatchCheckLayerAvailability"
+              - "ecr:PutImage"
+              - "ecr:InitiateLayerUpload"
+              - "ecr:UploadLayerPart"
+              - "ecr:CompleteLayerUpload"
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackend

@@ -10,7 +10,7 @@ permissions:
 jobs:
   cloudformation_deploy:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, "refs/heads/test/")
+    if: startsWith(github.ref, 'refs/heads/test/')
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3

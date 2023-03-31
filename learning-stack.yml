@@ -405,7 +405,7 @@ Resources:
       HealthyThresholdCount: 2
       Matcher:
         HttpCode: "200"
-      Port: 8000
+      Port: !Ref GraphQLBackendPort
       Name: !Sub ${StackAlias}GraphQLBackend
       Protocol: HTTP
       TargetType: ip
@@ -463,7 +463,7 @@ Resources:
           Image: !Ref GraphQLECRRepositoryURI
           Essential: true
           PortMappings:
-            - ContainerPort: 8000
+            - ContainerPort: !Ref GraphQLBackendPort
               Protocol: tcp
           Environment:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE
@@ -475,7 +475,7 @@ Resources:
             - Name: APP_DB__PASSWORD
               Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
             - Name: APP_APP__PORT
-              Value: '8000'
+              Value: !Sub ${GraphQLBackendPort}
             - Name: APP_DB__HOST
               Value: !GetAtt DatabaseInstance.Endpoint.Address
             - Name: APP_DB__DB_NAME

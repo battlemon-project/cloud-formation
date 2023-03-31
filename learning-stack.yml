@@ -304,13 +304,6 @@ Resources:
       NatGatewayId: !Ref NatGateway1
       RouteTableId: !Ref PrivateRouteTable1
 
-  #  PrivateSubnet1ToPrivateSubnet3Route:
-  #    Type: AWS::EC2::Route
-  #    Properties:
-  #      DestinationCidrBlock: !Ref PrivateSubnet3CIDR
-  #      RouteTableId: !Ref PrivateRouteTable1
-  #      NetworkInterfaceId: !GetAtt PrivateSubnet3.NetworkInterfaceId
-
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:

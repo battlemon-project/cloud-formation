@@ -344,8 +344,8 @@ Resources:
     Properties:
       DBSubnetGroupDescription: Subnet group for RDS database
       SubnetIds:
-        - !Ref PrivateSubnet1
-        - !Ref PrivateSubnet2
+        - !Ref PrivateSubnet3
+        - !Ref PrivateSubnet4
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}DatabaseSubnetGroup
@@ -507,7 +507,7 @@ Resources:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE
               Value: /graphql/playground
             - Name: APP_APP__HOST
-              Value: 127.0.0.1
+              Value: 0.0.0.0
             - Name: APP_DB__USERNAME
               Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
             - Name: APP_DB__PASSWORD

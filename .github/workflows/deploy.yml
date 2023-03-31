@@ -1,12 +1,13 @@
 name: AWS CloudFormation Deploy
 on:
-  [ push, workflow_dispatch ]
+  [ push, workflow_dispatch, pull_request ]
 env:
   AWS_REGION: "ap-southeast-1"
 # permission can be added at job level or workflow level
 permissions:
   id-token: write   # This is required for requesting the JWT
   contents: read    # This is required for actions/checkout
+runs:
 jobs:
   cloudformation_deploy:
     runs-on: ubuntu-latest

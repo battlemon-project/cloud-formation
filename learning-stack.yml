@@ -476,6 +476,12 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}TaskExecutionRole
 
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/graphql
+      RetentionInDays: 7
+
   GraphQLBackendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -507,6 +513,12 @@ Resources:
               Value: postgres
             - Name: APP_DB__PORT
               Value: !Sub ${RDSPort}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: ecs
       Cpu: 256
       Memory: 0.5 GB
       RuntimePlatform:

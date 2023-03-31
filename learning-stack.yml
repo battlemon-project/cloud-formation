@@ -365,13 +365,15 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
-        - Type: redirect
-          RedirectConfig:
-            Host: "#{host}"
-            Path: "/#{path}"
-            Port: "443"
-            Protocol: HTTPS
-            StatusCode: HTTP_301
+        #        - Type: redirect
+        #          RedirectConfig:
+        #            Host: "#{host}"
+        #            Path: "/#{path}"
+        #            Port: "443"
+        #            Protocol: HTTPS
+        #            StatusCode: HTTP_301
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
       LoadBalancerArn: !Ref ApplicationLoadBalancer
       Port: 80
       Protocol: HTTP
@@ -397,11 +399,11 @@ Resources:
       HealthCheckTimeoutSeconds: 5
       HealthyThresholdCount: 2
       Matcher:
-        HttpCode: "200,302"
-      Name: !Sub ${StackAlias}WebServers
-      Port: 80
+        HttpCode: "200"
+      Port: 8000
+      Name: !Sub ${StackAlias}GraphQLBackend
       Protocol: HTTP
-      #      TargetType:
+      TargetType: ip
       UnhealthyThresholdCount: 5
       VpcId:
         !Ref VPC
@@ -432,13 +434,13 @@ Resources:
       ServiceName: !Sub ${StackAlias}GraphQLBackendService
       Cluster: !Ref BackendCluster
       TaskDefinition: !Ref GraphQLBackendTaskDefinition
-      DesiredCount: 1
+      DesiredCount: 2
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
-          Subnets: !Ref PrivateSubnet1
-          SecurityGroups: [ !Ref ServiceSecurityGroup ]
+          Subnets: [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]
+          SecurityGroups: [ !Ref GraphQLServerSecurityGroup ]
       LoadBalancers:
         - ContainerName: !Sub ${StackAlias}GraphQLBackend
           ContainerPort: 8000

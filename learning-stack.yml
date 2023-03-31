@@ -389,3 +389,11 @@ Resources:
       UnhealthyThresholdCount: 5
       VpcId:
         !Ref VPC
+
+  GraphQLBackendECRRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: GraphQLBackend
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}GraphQLBackend

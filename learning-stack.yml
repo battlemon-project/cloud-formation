@@ -488,7 +488,7 @@ Resources:
             - Name: APP_DB__DB_NAME
               Value: postgres
             - Name: APP_DB__PORT
-              Value: '5432'
+              Value: !Sub ${RDSPort}
       Cpu: 256
       Memory: 0.5 GB
       RuntimePlatform:

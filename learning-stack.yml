@@ -55,6 +55,16 @@ Parameters:
     Type: String
     Default: "941572822749.dkr.ecr.us-east-1.amazonaws.com/graphql-backend:1.0.0"
 
+  GraphQLBackendPort:
+    Description: GraphQL backend port
+    Type: Number
+    Default: 8000
+
+  RDSPort:
+    Description: GraphQL backend port
+    Type: Number
+    Default: 5432
+
 Resources:
   # Secrets
   RDSSecret:
@@ -216,19 +226,19 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}ALBSecurityGroup
 
-  WebServerSecurityGroup:
+  GraphQLServerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable HTTP access via ALB on port 8000
+      GroupDescription: Enable HTTP access via ALB on port 8000 by default, but can be overwritten by GraphQLBackendPort parameter
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 8000
-          ToPort: 8000
-          CidrIp: 0.0.0.0/0
+          FromPort: !Ref GraphQLBackendPort
+          ToPort: !Ref GraphQLBackendPort
+          CidrIp: !Ref VpcCIDR
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}WebServerSecurityGroup
+          Value: !Sub ${StackAlias}GraphQLSecurityGroup
 
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -236,13 +246,13 @@ Resources:
       GroupDescription: Enable database access on port 5432 only from Private Subnets 2 and 3
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          CidrIp: !Ref PrivateSubnet2CIDR
+          FromPort: !Ref RDSPort
+          ToPort: !Ref RDSPort
+          CidrIp: !Ref PrivateSubnet1CIDR
         - IpProtocol: tcp
-          FromPort: 5432
-          ToPort: 5432
-          CidrIp: !Ref PrivateSubnet3CIDR
+          FromPort: !Ref RDSPort
+          ToPort: !Ref RDSPort
+          CidrIp: !Ref PrivateSubnet2CIDR
       VpcId: !Ref VPC
       Tags:
         - Key: Name
@@ -293,6 +303,13 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway1
       RouteTableId: !Ref PrivateRouteTable1
+
+  #  PrivateSubnet1ToPrivateSubnet3Route:
+  #    Type: AWS::EC2::Route
+  #    Properties:
+  #      DestinationCidrBlock: !Ref PrivateSubnet3CIDR
+  #      RouteTableId: !Ref PrivateRouteTable1
+  #      NetworkInterfaceId: !GetAtt PrivateSubnet3.NetworkInterfaceId
 
   PrivateSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -348,7 +365,7 @@ Resources:
       MasterUsername: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
       MasterUserPassword: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
       MultiAZ: false
-      Port: 5432
+      Port: !Ref RDSPort
       PubliclyAccessible: false
       StorageEncrypted: false
       VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]
@@ -365,13 +382,15 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
-        - Type: redirect
-          RedirectConfig:
-            Host: "#{host}"
-            Path: "/#{path}"
-            Port: "443"
-            Protocol: HTTPS
-            StatusCode: HTTP_301
+        #        - Type: redirect
+        #          RedirectConfig:
+        #            Host: "#{host}"
+        #            Path: "/#{path}"
+        #            Port: "443"
+        #            Protocol: HTTPS
+        #            StatusCode: HTTP_301
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
       LoadBalancerArn: !Ref ApplicationLoadBalancer
       Port: 80
       Protocol: HTTP
@@ -389,23 +408,22 @@ Resources:
   #      Port: 443
   #      Protocol: HTTPS
 
-  #  ALBTargetGroup:
-  #    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-  #    Properties:
-  #      HealthCheckIntervalSeconds: 10
-  #      HealthCheckPath: /healthcheck
-  #      HealthCheckTimeoutSeconds: 5
-  #      HealthyThresholdCount: 2
-  #      Matcher:
-  #        HttpCode: "200,302"
-  #      Name: !Sub ${StackAlias}WebServers
-  #      Port: 80
-  #      Protocol: HTTP
-  #      TargetType:
-  #
-  #      UnhealthyThresholdCount: 5
-  #      VpcId:
-  #        !Ref VPC
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /healthcheck
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200"
+      Port: !Ref GraphQLBackendPort
+      Name: !Sub ${StackAlias}GraphQLBackend
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 5
+      VpcId:
+        !Ref VPC
 
   # Cluster
   BackendCluster:
@@ -427,58 +445,89 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendCluster
 
-  #  GraphQLBackendService:
-  #    Type: AWS::ECS::Service
-  #    Properties:
-  #      ServiceName: !Sub ${StackAlias}GraphQLBackendService
-  #      Cluster: !Ref GraphQLBackendCluster
-  #      TaskDefinition: !Ref GraphQLBackendTaskDefinition
-  #      DesiredCount: 1
-  #      LaunchType: FARGATE
-  #      NetworkConfiguration:
-  #        AwsvpcConfiguration:
-  #          AssignPublicIp: DISABLED
-  #          Subnets: !Ref PrivateSubnets
-  #          SecurityGroups: [ !Ref ServiceSecurityGroup ]
-  #      LoadBalancers:
-  #        - ContainerName: !Sub ${StackAlias}GraphQLBackend
-  #          ContainerPort: 8000
-  #          TargetGroupArn: !Ref ServiceTargetGroup
-  #      Tags:
-  #        - Key: Name
-  #          Value: !Sub ${StackAlias}GraphQLBackendService
+  GraphQLBackendService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub ${StackAlias}GraphQLBackendService
+      Cluster: !Ref BackendCluster
+      TaskDefinition: !Ref GraphQLBackendTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]
+          SecurityGroups: [ !Ref GraphQLServerSecurityGroup ]
+      LoadBalancers:
+        - ContainerName: !Sub ${StackAlias}GraphQLBackend
+          ContainerPort: !Ref GraphQLBackendPort
+          TargetGroupArn: !Ref ALBTargetGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}GraphQLBackendService
 
-  # Task definitions
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${StackAlias}TaskExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}TaskExecutionRole
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/graphql
+      RetentionInDays: 7
+
   GraphQLBackendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      RequiresCompatibilities: [ FARGATE ]
       Family: !Sub ${StackAlias}GraphQLBackend
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
       ContainerDefinitions:
         - Name: !Sub ${StackAlias}GraphQLBackend
           Image: !Ref GraphQLECRRepositoryURI
           Essential: true
           PortMappings:
-            - ContainerPort: 8000
+            - ContainerPort: !Ref GraphQLBackendPort
               Protocol: tcp
           Environment:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE
               Value: /graphql/playground
             - Name: APP_APP__HOST
-              Value: 127.0.0.1
+              Value: 0.0.0.0
             - Name: APP_DB__USERNAME
               Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
             - Name: APP_DB__PASSWORD
               Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
             - Name: APP_APP__PORT
-              Value: '8000'
+              Value: !Sub ${GraphQLBackendPort}
             - Name: APP_DB__HOST
               Value: !GetAtt DatabaseInstance.Endpoint.Address
             - Name: APP_DB__DB_NAME
               Value: postgres
             - Name: APP_DB__PORT
-              Value: '5432'
-      Cpu: 1 vCPU
-      Memory: 1 GB
+              Value: !Sub ${RDSPort}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: ecs
+      Cpu: 256
+      Memory: 0.5 GB
       RuntimePlatform:
         CpuArchitecture: ARM64
         OperatingSystemFamily: LINUX

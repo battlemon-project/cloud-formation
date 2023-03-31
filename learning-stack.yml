@@ -457,6 +457,7 @@ Resources:
   GraphQLBackendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      RequiresCompatibilities: [ FARGATE ]
       Family: !Sub ${StackAlias}GraphQLBackend
       ContainerDefinitions:
         - Name: !Sub ${StackAlias}GraphQLBackend
@@ -482,8 +483,8 @@ Resources:
               Value: postgres
             - Name: APP_DB__PORT
               Value: '5432'
-      Cpu: 1 vCPU
-      Memory: 1 GB
+      Cpu: 256
+      Memory: 0.5 GB
       RuntimePlatform:
         CpuArchitecture: ARM64
         OperatingSystemFamily: LINUX

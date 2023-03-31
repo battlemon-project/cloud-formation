@@ -361,6 +361,7 @@ Resources:
       Port: !Ref RDSPort
       PubliclyAccessible: false
       StorageEncrypted: false
+
       VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]
 
   # Application Load Balancer
@@ -444,7 +445,7 @@ Resources:
       ServiceName: !Sub ${StackAlias}GraphQLBackendService
       Cluster: !Ref BackendCluster
       TaskDefinition: !Ref GraphQLBackendTaskDefinition
-      DesiredCount: 2
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:

@@ -420,7 +420,7 @@ Resources:
             - ContainerPort: 8000
               Protocol: tcp
           CPU: 0
-          Memory: 1 GB
+          Memory: 1024
           Environment:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE
               Value: /graphql/playground

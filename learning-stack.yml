@@ -460,8 +460,6 @@ Resources:
           PortMappings:
             - ContainerPort: 8000
               Protocol: tcp
-          Cpu: .5
-          Memory: 1024
           Environment:
             - Name: APP_GRAPHQL__PLAYGROUND_ROUTE
               Value: /graphql/playground
@@ -479,6 +477,11 @@ Resources:
               Value: postgres
             - Name: APP_DB__PORT
               Value: '5432'
+      Cpu: 1 vCPU
+      Memory: 1 GB
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+        OperatingSystemFamily: LINUX
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendTaskDefinition

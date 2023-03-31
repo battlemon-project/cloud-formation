@@ -46,11 +46,27 @@ Parameters:
     Type: String
     Default: 10.0.5.0/24
 
-#  AcmCertificate:
-#    Description: The ARN of the AWS Certificate Manager (ACM) certificate to use for the load balancer
-#    Type: String
+  #  AcmCertificate:
+  #    Description: The ARN of the AWS Certificate Manager (ACM) certificate to use for the load balancer
+  #    Type: String
+
+  GraphQLECRRepositoryURI:
+    Description: GraphQL backend repository's URI of Amazon Container Registry
+    Type: String
+    Default: "941572822749.dkr.ecr.us-east-1.amazonaws.com/graphql-backend:1.0.0"
 
 Resources:
+  # Secrets
+  RDSSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub ${StackAlias}RDSSecret
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "postgres"}'
+        GenerateStringKey: "password"
+        PasswordLength: 20
+        ExcludeCharacters: '"@/\'
+  # VPC
   VPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -389,26 +405,25 @@ Resources:
       VpcId:
         !Ref VPC
 
-  GraphQLBackendECRRepository:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName: graphql-backend
-      RepositoryPolicyText:
-        Version: "2012-10-17"
-        Statement:
-          - Sid: AllowPushPull
-            Effect: Allow
-            Condition:
-              StringEquals:
-                "aws:SourceAccount": !Ref AWS::AccountId
-            Action:
-              - "ecr:GetDownloadUrlForLayer"
-              - "ecr:BatchGetImage"
-              - "ecr:BatchCheckLayerAvailability"
-              - "ecr:PutImage"
-              - "ecr:InitiateLayerUpload"
-              - "ecr:UploadLayerPart"
-              - "ecr:CompleteLayerUpload"
-      Tags:
-        - Key: Name
-          Value: !Sub ${StackAlias}GraphQLBackend
+#  # Containers definitions
+#  GraphQLBackendContainerDefinition:
+#    Type: AWS::ECS::TaskDefinition
+#    Properties:
+#      Family: !Sub ${StackAlias}GraphQLBackend
+#      ContainerDefinitions:
+#        - Name: !Sub ${StackAlias}GraphQLBackend
+#          Image: !Ref GraphQLECRRepositoryURI
+#          Essential: true
+#          RuntimePlatform:
+#            CpuArchitecture: ARM64
+#          PortMappings:
+#            - ContainerPort: 8000
+#              Protocol: tcp
+#          CPU: 0
+#          Memory: 1 GB
+#          Environment:
+#            - Name: MY_ENV_VAR
+#              Value: my-value
+#      Tags:
+#        - Key: Name
+#          Value: !Sub ${StackAlias}GraphQLBackendContainerDefinition

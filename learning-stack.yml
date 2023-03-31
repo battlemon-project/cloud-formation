@@ -389,21 +389,64 @@ Resources:
   #      Port: 443
   #      Protocol: HTTPS
 
-  ALBTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  #  ALBTargetGroup:
+  #    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+  #    Properties:
+  #      HealthCheckIntervalSeconds: 10
+  #      HealthCheckPath: /healthcheck
+  #      HealthCheckTimeoutSeconds: 5
+  #      HealthyThresholdCount: 2
+  #      Matcher:
+  #        HttpCode: "200,302"
+  #      Name: !Sub ${StackAlias}WebServers
+  #      Port: 80
+  #      Protocol: HTTP
+  #      TargetType:
+  #
+  #      UnhealthyThresholdCount: 5
+  #      VpcId:
+  #        !Ref VPC
+
+  # Cluster
+  BackendCluster:
+    Type: AWS::ECS::Cluster
     Properties:
-      HealthCheckIntervalSeconds: 10
-      HealthCheckPath: /healthcheck
-      HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 2
-      Matcher:
-        HttpCode: "200,302"
-      Name: !Sub ${StackAlias}WebServers
-      Port: 80
-      Protocol: HTTP
-      UnhealthyThresholdCount: 5
-      VpcId:
-        !Ref VPC
+      ClusterName: !Sub ${StackAlias}BackendCluster
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+        - CapacityProvider: FARGATE_SPOT
+          Weight: 1
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}GraphQLBackendCluster
+
+#  GraphQLBackendService:
+#    Type: AWS::ECS::Service
+#    Properties:
+#      ServiceName: !Sub ${StackAlias}GraphQLBackendService
+#      Cluster: !Ref GraphQLBackendCluster
+#      TaskDefinition: !Ref GraphQLBackendTaskDefinition
+#      DesiredCount: 1
+#      LaunchType: FARGATE
+#      NetworkConfiguration:
+#        AwsvpcConfiguration:
+#          AssignPublicIp: DISABLED
+#          Subnets: !Ref PrivateSubnets
+#          SecurityGroups: [ !Ref ServiceSecurityGroup ]
+#      LoadBalancers:
+#        - ContainerName: !Sub ${StackAlias}GraphQLBackend
+#          ContainerPort: 8000
+#          TargetGroupArn: !Ref ServiceTargetGroup
+#      Tags:
+#        - Key: Name
+#          Value: !Sub ${StackAlias}GraphQLBackendService
 
   # Task definitions
   GraphQLBackendTaskDefinition:
@@ -439,3 +482,5 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendTaskDefinition
+
+

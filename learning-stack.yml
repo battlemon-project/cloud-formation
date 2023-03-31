@@ -358,7 +358,7 @@ Resources:
       MasterUsername: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
       MasterUserPassword: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
       MultiAZ: false
-      Port: 5432
+      Port: !Ref RDSPort
       PubliclyAccessible: false
       StorageEncrypted: false
       VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]

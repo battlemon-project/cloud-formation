@@ -60,22 +60,33 @@ Parameters:
     Type: Number
     Default: 8000
 
-  RDSPort:
-    Description: GraphQL backend port
+  DatabaseUsername:
+    Description: Database username
+    Type: String
+    Default: postgres
+
+  DatabaseName:
+    Description: Database name
+    Type: String
+    Default: postgres
+
+  DatabasePort:
+    Description: Database port
     Type: Number
     Default: 5432
 
 Resources:
   # Secrets
-  RDSSecret:
+  DatabaseSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      Name: !Sub ${StackAlias}RDSSecret
+      Name: !Sub ${StackAlias}DatabaseSecret
       GenerateSecretString:
-        SecretStringTemplate: '{"username": "postgres"}'
+        SecretStringTemplate: !Sub '{"username": "${DatabaseUsername}"'
         GenerateStringKey: "password"
         PasswordLength: 20
         ExcludeCharacters: '"@/\'
+
   # VPC
   VPC:
     Type: AWS::EC2::VPC
@@ -243,15 +254,15 @@ Resources:
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Enable database access on port 5432 only from Private Subnets 2 and 3
+      GroupDescription: Enable database access on port (default 5432) only from Private Subnets 2 and 3
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: !Ref RDSPort
-          ToPort: !Ref RDSPort
+          FromPort: !Ref DatabasePort
+          ToPort: !Ref DatabasePort
           CidrIp: !Ref PrivateSubnet1CIDR
         - IpProtocol: tcp
-          FromPort: !Ref RDSPort
-          ToPort: !Ref RDSPort
+          FromPort: !Ref DatabasePort
+          ToPort: !Ref DatabasePort
           CidrIp: !Ref PrivateSubnet2CIDR
       VpcId: !Ref VPC
       Tags:
@@ -351,14 +362,14 @@ Resources:
       BackupRetentionPeriod: 0
       DBInstanceClass: db.m6i.large
       DBInstanceIdentifier: !Sub ${StackAlias}DatabaseInstance
-      DBName: postgres
+      DBName: !Ref DatabaseName
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       Engine: postgres
       EngineVersion: 15.2
-      MasterUsername: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
-      MasterUserPassword: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
+      MasterUsername: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:username}}'
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}'
       MultiAZ: false
-      Port: !Ref RDSPort
+      Port: !Ref DatabasePort
       PubliclyAccessible: false
       StorageEncrypted: false
       VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]
@@ -501,18 +512,18 @@ Resources:
               Value: /graphql/playground
             - Name: APP_APP__HOST
               Value: 0.0.0.0
-            - Name: APP_DB__USERNAME
-              Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:username}}'
-            - Name: APP_DB__PASSWORD
-              Value: !Sub '{{resolve:secretsmanager:${RDSSecret}:SecretString:password}}'
             - Name: APP_APP__PORT
               Value: !Sub ${GraphQLBackendPort}
+            - Name: APP_DB__USERNAME
+              Value: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:username}}'
+            - Name: APP_DB__PASSWORD
+              Value: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}'
             - Name: APP_DB__HOST
               Value: !GetAtt DatabaseInstance.Endpoint.Address
             - Name: APP_DB__DB_NAME
-              Value: postgres
+              Value: !Sub ${DatabaseName}
             - Name: APP_DB__PORT
-              Value: !Sub ${RDSPort}
+              Value: !Sub ${DatabasePort}
           LogConfiguration:
             LogDriver: awslogs
             Options:

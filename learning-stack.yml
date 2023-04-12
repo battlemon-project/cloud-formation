@@ -360,7 +360,7 @@ Resources:
       AllocatedStorage: 20
       AvailabilityZone: !Select [ 0, !GetAZs  "" ]
       BackupRetentionPeriod: 0
-      DBInstanceClass: db.m6i.large
+      DBInstanceClass: db.t3.micro
       DBInstanceIdentifier: !Sub ${StackAlias}DatabaseInstance
       DBName: !Ref DatabaseName
       DBSubnetGroupName: !Ref DatabaseSubnetGroup

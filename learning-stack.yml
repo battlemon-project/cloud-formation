@@ -60,6 +60,21 @@ Parameters:
     Type: Number
     Default: 8000
 
+  IndexerBackendSuiNodeHttpUrl:
+    Description: Http url for json-rpc requests to sui node
+    Type: String
+    Default: "https://node.shinami.com:443/api/v1/49fb3700ec44f083e7c7b4de63846491"
+
+  IndexerBackendSuiNodeWsUrl:
+    Description: ws url for getting contract's events from sui node
+    Type: String
+    Default: "wss://node.shinami.com:443/ws/v1/49fb3700ec44f083e7c7b4de63846491"
+
+  IndexerBackendSuiContract:
+    Description: package id
+    Type: String
+    Default: "0xd0b32d8c36afa75144b284c070f23785855612ba478ecc0643574f49627ac9c6"
+
   DatabaseUsername:
     Description: Database username
     Type: String
@@ -83,7 +98,6 @@ Resources:
       Name: !Sub ${StackAlias}DatabaseSecret
       GenerateSecretString:
         SecretStringTemplate: !Sub '{"username": "${DatabaseUsername}"}'
-#          - { username: !Ref DatabaseUsername }
         GenerateStringKey: "password"
         PasswordLength: 20
         ExcludeCharacters: '"@/\'
@@ -450,6 +464,24 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendCluster
 
+  TaskExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${StackAlias}TaskExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}TaskExecutionRole
+
+# graphql service
   GraphQLBackendService:
     Type: AWS::ECS::Service
     Properties:
@@ -471,24 +503,7 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendService
 
-  TaskExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: !Sub ${StackAlias}TaskExecutionRole
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ecs-tasks.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
-      Tags:
-        - Key: Name
-          Value: !Sub ${StackAlias}TaskExecutionRole
-
-  LogGroup:
+  GraphQLLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: /aws/ecs/graphql
@@ -528,7 +543,7 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Ref LogGroup
+              awslogs-group: !Ref GraphQLLogGroup
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: ecs
       Cpu: 256
@@ -541,3 +556,64 @@ Resources:
           Value: !Sub ${StackAlias}GraphQLBackendTaskDefinition
 
 
+  # indexer service
+  IndexerBackendService:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub ${StackAlias}IndexerBackendService
+      Cluster: !Ref BackendCluster
+      TaskDefinition: !Ref IndexerBackendTaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]
+#          SecurityGroups: [ !Ref GraphQLServerSecurityGroup ]
+#      LoadBalancers:
+#        - ContainerName: !Sub ${StackAlias}IndexerBackend
+#          ContainerPort: !Ref IndexerBackendPort
+#          TargetGroupArn: !Ref ALBTargetGroup
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}IndexerBackendService
+
+  IndexerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/indexer
+      RetentionInDays: 7
+
+  IndexerTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [ FARGATE ]
+      Family: !Sub ${StackAlias}GraphQLBackend
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+      ContainerDefinitions:
+        - Name: !Sub ${StackAlias}IndexerBackend
+          Image: !Ref IndexerBackendECRRepositoryURI
+          Essential: true
+#          PortMappings:
+#            - ContainerPort: !Ref IndexerBackendPort
+#              Protocol: tcp
+          Environment:
+            - Name: APP_SUI_NODE__HTTP_URL
+              Value: /graphql/playground
+            - Name: APP_APP__HOST
+              Value: !Ref
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref IndexerLogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: ecs
+      Cpu: 256
+      Memory: 0.5 GB
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+        OperatingSystemFamily: LINUX
+      Tags:
+        - Key: Name
+          Value: !Sub ${StackAlias}IndexerBackendTaskDefinition

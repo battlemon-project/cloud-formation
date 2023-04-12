@@ -50,10 +50,15 @@ Parameters:
   #    Description: The ARN of the AWS Certificate Manager (ACM) certificate to use for the load balancer
   #    Type: String
 
-  GraphQLECRRepositoryURI:
+  GraphQLBackendECRRepositoryURI:
     Description: GraphQL backend repository's URI of Amazon Container Registry
     Type: String
     Default: "941572822749.dkr.ecr.us-east-1.amazonaws.com/graphql-backend:1.0.0"
+
+  IndexerBackendECRRepositoryURI:
+    Description: Indexer backend repository's URI of Amazon Container Registry
+    Type: String
+    Default: "941572822749.dkr.ecr.us-east-1.amazonaws.com/sui-indexer:1.0.0"
 
   GraphQLBackendPort:
     Description: GraphQL backend port
@@ -481,7 +486,7 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}TaskExecutionRole
 
-# graphql service
+  # graphql service
   GraphQLBackendService:
     Type: AWS::ECS::Service
     Properties:
@@ -503,10 +508,10 @@ Resources:
         - Key: Name
           Value: !Sub ${StackAlias}GraphQLBackendService
 
-  GraphQLLogGroup:
+  GraphQLBackendLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
-      LogGroupName: /aws/ecs/graphql
+      LogGroupName: /aws/ecs/graphql-backend
       RetentionInDays: 7
 
   GraphQLBackendTaskDefinition:
@@ -518,7 +523,7 @@ Resources:
       ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
       ContainerDefinitions:
         - Name: !Sub ${StackAlias}GraphQLBackend
-          Image: !Ref GraphQLECRRepositoryURI
+          Image: !Ref GraphQLBackendECRRepositoryURI
           Essential: true
           PortMappings:
             - ContainerPort: !Ref GraphQLBackendPort
@@ -543,7 +548,7 @@ Resources:
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Ref GraphQLLogGroup
+              awslogs-group: !Ref GraphQLBackendLogGroup
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: ecs
       Cpu: 256
@@ -569,44 +574,48 @@ Resources:
         AwsvpcConfiguration:
           AssignPublicIp: DISABLED
           Subnets: [ !Ref PrivateSubnet1, !Ref PrivateSubnet2 ]
-#          SecurityGroups: [ !Ref GraphQLServerSecurityGroup ]
-#      LoadBalancers:
-#        - ContainerName: !Sub ${StackAlias}IndexerBackend
-#          ContainerPort: !Ref IndexerBackendPort
-#          TargetGroupArn: !Ref ALBTargetGroup
+      #          SecurityGroups: [ !Ref GraphQLServerSecurityGroup ]
+      #      LoadBalancers:
+      #        - ContainerName: !Sub ${StackAlias}IndexerBackend
+      #          ContainerPort: !Ref IndexerBackendPort
+      #          TargetGroupArn: !Ref ALBTargetGroup
       Tags:
         - Key: Name
           Value: !Sub ${StackAlias}IndexerBackendService
 
-  IndexerLogGroup:
+  IndexerBackendLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
       LogGroupName: /aws/ecs/indexer
       RetentionInDays: 7
 
-  IndexerTaskDefinition:
+  IndexerBackendTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
       RequiresCompatibilities: [ FARGATE ]
-      Family: !Sub ${StackAlias}GraphQLBackend
+      Family: !Sub ${StackAlias}IndexerBackend
       NetworkMode: awsvpc
       ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
       ContainerDefinitions:
         - Name: !Sub ${StackAlias}IndexerBackend
           Image: !Ref IndexerBackendECRRepositoryURI
           Essential: true
-#          PortMappings:
-#            - ContainerPort: !Ref IndexerBackendPort
-#              Protocol: tcp
+          #          PortMappings:
+          #            - ContainerPort: !Ref IndexerBackendPort
+          #              Protocol: tcp
           Environment:
             - Name: APP_SUI_NODE__HTTP_URL
-              Value: /graphql/playground
-            - Name: APP_APP__HOST
-              Value: !Ref
+              Value: !Ref IndexerBackendSuiNodeHttpUrl
+            - Name: APP_SUI_NODE__WS_URL
+              Value: !Ref IndexerBackendSuiNodeWsUrl
+            - Name: APP_SUI_CONTRACT__ADDRESS
+              Value: !Ref IndexerBackendSuiContract
+            - Name: APP_GRAPHQL_BACKEND__PORT
+              Value: !Ref GraphQLBackendPort
           LogConfiguration:
             LogDriver: awslogs
             Options:
-              awslogs-group: !Ref IndexerLogGroup
+              awslogs-group: !Ref IndexerBackendLogGroup
               awslogs-region: !Ref 'AWS::Region'
               awslogs-stream-prefix: ecs
       Cpu: 256

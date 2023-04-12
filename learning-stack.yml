@@ -82,9 +82,8 @@ Resources:
     Properties:
       Name: !Sub ${StackAlias}DatabaseSecret
       GenerateSecretString:
-        SecretStringTemplate: !Sub
-          - '{"username": "${username}"'
-          - { username: !Ref DatabaseUsername }
+        SecretStringTemplate: !Sub '{"username": "${DatabaseUsername}}"'
+#          - { username: !Ref DatabaseUsername }
         GenerateStringKey: "password"
         PasswordLength: 20
         ExcludeCharacters: '"@/\'

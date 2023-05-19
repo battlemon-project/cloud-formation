@@ -29,7 +29,6 @@ Resources:
         SecretStringTemplate: !Sub '{"username": "${DatabaseUsername}"}'
         GenerateStringKey: "password"
         PasswordLength: 20
-        ExcludePunctuation: true
         ExcludeCharacters: '"@/\'
 
   DatabaseSecurityGroup:

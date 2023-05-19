@@ -85,3 +85,13 @@ Outputs:
     Value: !GetAtt DatabaseInstance.Endpoint.Address
     Export:
       Name: BattlemonDatabaseInstanceEndpointAddress
+
+  DatabaseName:
+    Value: !Ref DatabaseName
+    Export:
+      Name: BattlemonDatabaseName
+
+  DatabasePort:
+    Value: !Ref DatabasePort
+    Export:
+      Name: BattlemonDatabasePort

@@ -44,43 +44,6 @@ Parameters:
     Default: 0x62c99ae88D1048d65aFF47a97f976c8F174B5Ee5
 
 Resources:
-  # Secrets
-  JWTSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: LemolandJWTSecret
-      SecretString: "CHANGE ME"
-      Tags:
-        - Key: Name
-          Value: LemolandJWTSecret
-
-  DiscordBotTokenSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: LemolandDiscordBotTokenSecret
-      SecretString: "CHANGE ME"
-      Tags:
-        - Key: Name
-          Value: LemolandDiscordBotTokenSecret
-
-  BlockchainProviderUrl:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: LemolandBlockchainProviderUrl
-      SecretString: "CHANGE ME"
-      Tags:
-        - Key: Name
-          Value: LemolandBlockchainProviderUrl
-
-  LemolandServerPrivateKey:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      Name: LemolandServerPrivateKey
-      SecretString: "CHANGE ME"
-      Tags:
-        - Key: Name
-          Value: LemolandServerPrivateKey
-
   # Application Load Balancer
   ALBSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -262,13 +225,21 @@ Resources:
                 - '{{resolve:secretsmanager:${Arn}:SecretString:password}}'
                 - Arn: !ImportValue BattlemonDatabaseSecret
             - Name: JWT_SECRET
-              Value: !Sub '{{resolve:secretsmanager:${JWTSecret}:SecretString}}'
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
+                - Arn: !ImportValue LemolandJWTSecret
             - Name: DISCORD_BOT_TOKEN
-              Value: !Sub '{{resolve:secretsmanager:${DiscordBotTokenSecret}:SecretString}}'
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
+                - Arn: !ImportValue LemolandDiscordBotToken
             - Name: BLOCKCHAIN_PROVIDER_URL
-              Value: !Sub '{{resolve:secretsmanager:${BlockchainProviderUrl}:SecretString}}'
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
+                - Arn: !ImportValue LemolandBlockchainProviderUrl
             - Name: SERVER_PRIVATE_KEY
-              Value: !Sub '{{resolve:secretsmanager:${LemolandServerPrivateKey}:SecretString}}'
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
+                - Arn: !ImportValue LemolandServerPrivateKey
           LogConfiguration:
             LogDriver: awslogs
             Options:

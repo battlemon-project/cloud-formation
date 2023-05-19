@@ -2,7 +2,7 @@ name: AWS CloudFormation Deploy
 on:
   [ push, workflow_dispatch ]
 env:
-  AWS_REGION: "ap-southeast-1"
+  AWS_REGION: "eu-central-1"
 # permission can be added at job level or workflow level
 permissions:
   id-token: write   # This is required for requesting the JWT
@@ -25,8 +25,8 @@ jobs:
       - name: Deploy stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: learning-stack
-          template: learning-stack.yml
+          name: vpc layer stack
+          template: vpc.yml
           no-fail-on-empty-changeset: "1"
           disable-rollback: "1"
           capabilities: CAPABILITY_NAMED_IAM

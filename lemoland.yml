@@ -1,0 +1,214 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Lemoland layer
+
+Parameters:
+  LemolandBackendPort:
+    Description: Lemoland backend port
+    Type: Number
+    Default: 3000
+
+  LemolandBackendECRRepositoryURI:
+    Description: Lemoland backend repository's URI of Amazon Container Registry
+    Type: String
+    Default: "987666890397.dkr.ecr.eu-central-1.amazonaws.com/lemoland-api-nodejs:latest"
+
+Resources:
+  # Application Load Balancer
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP and HTTPS access on port 80/443
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !ImportValue BattlemonVpcId
+      Tags:
+        - Key: Name
+          Value: ALBSecurityGroup
+
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: ALB
+      SecurityGroups: [ !Ref ALBSecurityGroup ]
+      Subnets: [ !ImportValue BattlemonPublicSubnet1, !ImportValue BattlemonPublicSubnet2 ]
+
+  ALBListenerNoSslCertificate:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        #        - Type: redirect
+        #          RedirectConfig:
+        #            Host: "#{host}"
+        #            Path: "/#{path}"
+        #            Port: "443"
+        #            Protocol: HTTPS
+        #            StatusCode: HTTP_301
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  # Implement it later when issue certs for domain
+  #  ALBListenerSslCertificate:
+  #    Type: AWS::ElasticLoadBalancingV2::Listener
+  #    Properties:
+  #      Certificates:
+  #        - CertificateArn: !Ref AcmCertificate
+  #      DefaultActions:
+  #        - Type: forward
+  #          TargetGroupArn: !Ref ALBTargetGroup
+  #      LoadBalancerArn: !Ref ApplicationLoadBalancer
+  #      Port: 443
+  #      Protocol: HTTPS
+
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /healthcheck
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200"
+      Port: !Ref LemolandBackendPort
+      Name: LemolandBackend
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 5
+      VpcId:
+        !ImportValue BattlemonVpcId
+
+  # Backend cluster
+  LemolandSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP access via ALB on port 3000 by default, but can be overwritten by LemolandBackendPort parameter
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref LemolandBackendPort
+          ToPort: !Ref LemolandBackendPort
+          CidrIp: !ImportValue BattlemonVpcCIDR
+      VpcId: !ImportValue BattlemonVpcId
+      Tags:
+        - Key: Name
+          Value: LemolandSecurityGroup
+
+  LemolandBackendCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: LemolandBackendCluster
+      CapacityProviders:
+        - FARGATE
+        - FARGATE_SPOT
+      DefaultCapacityProviderStrategy:
+        - CapacityProvider: FARGATE
+          Weight: 1
+        - CapacityProvider: FARGATE_SPOT
+          Weight: 1
+      ClusterSettings:
+        - Name: containerInsights
+          Value: enabled
+      Tags:
+        - Key: Name
+          Value: LemolandBackendCluster
+
+
+#  # Lemoland service
+#  LemolandBackendService:
+#    Type: AWS::ECS::Service
+#    Properties:
+#      ServiceName: LemolandBackendService
+#      Cluster: !Ref LemolandBackendCluster
+#      TaskDefinition: !Ref LemolandTaskDefinition
+#      DesiredCount: 2
+#      LaunchType: FARGATE
+#      NetworkConfiguration:
+#        AwsvpcConfiguration:
+#          AssignPublicIp: DISABLED
+#          Subnets: [ !ImportValue BattlemonPrivateSubnet1, !ImportValue BattlemonPrivateSubnet2 ]
+#          SecurityGroups: [ !Ref LemolandSecurityGroup ]
+#      LoadBalancers:
+#        - ContainerName: LemolandBackend
+#          ContainerPort: !Ref LemolandBackendPort
+#          TargetGroupArn: !Ref ALBTargetGroup
+#      Tags:
+#        - Key: Name
+#          Value: LemolandBackendService
+#
+#  LemolandBackendLogGroup:
+#    Type: AWS::Logs::LogGroup
+#    Properties:
+#      LogGroupName: /aws/ecs/lemoland-backend
+#      RetentionInDays: 7
+
+#  LemolandTaskDefinition:
+#    Type: AWS::ECS::TaskDefinition
+#    Properties:
+#      RequiresCompatibilities: [ FARGATE ]
+#      Family: LemolandBackend
+#      NetworkMode: awsvpc
+#      ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
+#      ContainerDefinitions:
+#        - Name: LemolandBackend
+#          Image: !Ref LemolandBackendECRRepositoryURI
+#          Essential: true
+#          PortMappings:
+#            - ContainerPort: !Ref LemolandBackendPort
+#              Protocol: tcp
+#          Environment:
+#            - Name: PORT
+#              Value: !Sub ${LemolandBackendPort}
+#            - Name: DATABASE_HOST
+#              Value: !GetAtt DatabaseInstance.Endpoint.Address
+#            - Name: DATABASE_NAME
+#              Value: !Sub ${DatabaseName}
+#            - Name: DATABASE_PORT
+#              Value: !Sub ${DatabasePort}
+#            - Name: LOG_LEVEL
+#              Value: !Sub ${LemolandLogLevel}
+#            - Name: SERVE_SWAGGER
+#              Value: !Sub ${LemolandServeSwagger}
+#            - Name: DISCORD_GUILD_ID
+#              Value: !Sub ${LemonlandDiscordGuildId}
+#            - Name: ACCESS_KEY_CONTRACT_ADDRESS
+#              Value: !Sub ${LemolandAccessKeyContractAddress}
+#            - Name: GEMS_CONTRACT_ADDRESS
+#              Value: !Sub ${LemolandGemsContractAddress}
+#            - Name: REFERRAL_CONTRACT_ADDRESS
+#              Value: !Sub ${LemolandReferralContractAddress}
+#          Secrets:
+#            - Name: DATABASE_USER
+#              ValueFrom: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:username}}'
+#            - Name: DATABASE_PASSWORD
+#              ValueFrom: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}'
+#            - Name: JWT_SECRET
+#              Value: !Sub '{{resolve:secretsmanager:${LemolandJwtSecret}:SecretString}}'
+#            - Name: DISCORD_BOT_TOKEN
+#              Value: !Sub '{{resolve:secretsmanager:${DiscordBotTokenSecret}:SecretString}}'
+#            - Name: BLOCKCHAIN_PROVIDER_URL
+#              Value: !Sub '{{resolve:secretsmanager:${BlockchainProviderUrl}:SecretString}}'
+#            - Name: SERVER_PRIVATE_KEY
+#              Value: !Sub '{{resolve:secretsmanager:${LemolandServerPrivateKey}:SecretString}}'
+#          LogConfiguration:
+#            LogDriver: awslogs
+#            Options:
+#              awslogs-group: !Ref LemolandBackendLogGroup
+#              awslogs-region: !Ref 'AWS::Region'
+#              awslogs-stream-prefix: ecs
+#      Cpu: 256
+#      Memory: 0.5 GB
+#      RuntimePlatform:
+#        CpuArchitecture: X86_64
+#        OperatingSystemFamily: LINUX
+#      Tags:
+#        - Key: Name
+#          Value: LemolandBackendTaskDefinition

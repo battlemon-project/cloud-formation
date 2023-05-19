@@ -216,14 +216,14 @@ Resources:
             - Name: REFERRAL_CONTRACT_ADDRESS
               Value: !Ref LemolandReferralContractAddress
           Secrets:
-            - Name: DATABASE_USER
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString:username}}'
-                - Arn: !ImportValue BattlemonDatabaseSecret
-            - Name: DATABASE_PASSWORD
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString:password}}'
-                - Arn: !ImportValue BattlemonDatabaseSecret
+#            - Name: DATABASE_USER
+#              ValueFrom: !Sub
+#                - '{{resolve:secretsmanager:${Arn}:SecretString:username}}'
+#                - Arn: !ImportValue BattlemonDatabaseSecret
+#            - Name: DATABASE_PASSWORD
+#              ValueFrom: !Sub
+#                - '{{resolve:secretsmanager:${Arn}:SecretString:password}}'
+#                - Arn: !ImportValue BattlemonDatabaseSecret
             - Name: JWT_SECRET
               ValueFrom: !Sub
                 - '{{resolve:secretsmanager:${Arn}:SecretString}}'

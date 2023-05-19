@@ -49,6 +49,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: LemolandJWTSecret
+      SecretString: "CHANGE ME"
       Tags:
         - Key: Name
           Value: LemolandJWTSecret
@@ -57,6 +58,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: LemolandDiscordBotTokenSecret
+      SecretString: "CHANGE ME"
       Tags:
         - Key: Name
           Value: LemolandDiscordBotTokenSecret
@@ -65,6 +67,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: LemolandBlockchainProviderUrl
+      SecretString: "CHANGE ME"
       Tags:
         - Key: Name
           Value: LemolandBlockchainProviderUrl
@@ -73,6 +76,7 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: LemolandServerPrivateKey
+      SecretString: "CHANGE ME"
       Tags:
         - Key: Name
           Value: LemolandServerPrivateKey

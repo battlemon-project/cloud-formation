@@ -25,7 +25,7 @@ jobs:
       - name: Deploy stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: vpc layer stack
+          name: vpc-layer-stack
           template: vpc.yml
           no-fail-on-empty-changeset: "1"
           disable-rollback: "1"

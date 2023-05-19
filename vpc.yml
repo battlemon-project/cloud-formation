@@ -3,11 +3,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: VPC layer
 
 Parameters:
-  StackAlias:
-    Description: Alias of the stack
-    Type: String
-    Default: Battlemon
-
   VpcCIDR:
     Description: CIDR block for the VPC
     Type: String
@@ -53,7 +48,7 @@ Resources:
       InstanceTenancy: default
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}VPC
+          Value: BattlemonVPC
 
   # Internet Gateway
   InternetGateway:
@@ -61,7 +56,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}InternetGateway
+          Value: BattlemonInternetGateway
 
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -77,7 +72,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PublicRoutes
+          Value: BattlemonPublicRoutes
 
   DefaultPublicRoute:
     Type: AWS::EC2::Route
@@ -97,7 +92,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PublicSubnet1
+          Value: BattlemonPublicSubnet1
 
   PublicSubnet1RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -115,7 +110,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PublicSubnet2
+          Value: BattlemonPublicSubnet2
 
   PublicSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -133,7 +128,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PrivateSubnet1
+          Value: BattlemonPrivateSubnet1
         - Key: Tier
           Value: Backend
 
@@ -150,7 +145,7 @@ Resources:
       SubnetId: !Ref PublicSubnet1
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}NatGatewayPublicSubnet1
+          Value: BattlemonNatGatewayPublicSubnet1
 
   PrivateRouteTable1:
     Type: AWS::EC2::RouteTable
@@ -158,7 +153,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PrivateRoutes (AZ1)
+          Value: BattlemonPrivateRoutes (AZ1)
 
   DefaultPrivateRoute1:
     Type: AWS::EC2::Route
@@ -183,7 +178,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PrivateSubnet2
+          Value: BattlemonPrivateSubnet2
         - Key: Tier
           Value: Backend
 
@@ -200,7 +195,7 @@ Resources:
       SubnetId: !Ref PublicSubnet2
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}NatGatewayPublicSubnet2
+          Value: BattlemonNatGatewayPublicSubnet2
 
   PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
@@ -208,7 +203,7 @@ Resources:
       VpcId: !Ref VPC
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PrivateRoutes (AZ2)
+          Value: BattlemonPrivateRoutes (AZ2)
 
   DefaultPrivateRoute2:
     Type: AWS::EC2::Route
@@ -233,7 +228,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PrivateSubnet3
+          Value: BattlemonPrivateSubnet3
         - Key: Tier
           Value: Database
 
@@ -246,47 +241,47 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${StackAlias}PrivateSubnet4
+          Value: BattlemonPrivateSubnet4
         - Key: Tier
           Value: Database
 
 Outputs:
-  StackAlias:
-    Value: !Ref StackAlias
-    Export:
-      Name: StackAlias
-
   VpcId:
     Value: !Ref VPC
     Export:
-      Name: !Sub ${StackAlias}VpcId
+      Name: BattlemonVpcId
 
   PublicSubnet1:
     Value: !Ref PublicSubnet1
     Export:
-      Name: !Sub ${StackAlias}PublicSubnet1
+      Name: BattlemonPublicSubnet1
 
   PublicSubnet2:
     Value: !Ref PublicSubnet2
     Export:
-      Name: !Sub ${StackAlias}PublicSubnet2
+      Name: BattlemonPublicSubnet2
 
   PrivateSubnet1:
     Value: !Ref PrivateSubnet1
     Export:
-      Name: !Sub ${StackAlias}PrivateSubnet1
+      Name: BattlemonPrivateSubnet1
 
   PrivateSubnet2:
     Value: !Ref PrivateSubnet2
     Export:
-      Name: !Sub ${StackAlias}PrivateSubnet2
+      Name: BattlemonPrivateSubnet2
 
   PrivateSubnet3:
     Value: !Ref PrivateSubnet3
     Export:
-      Name: !Sub ${StackAlias}PrivateSubnet3
+      Name: BattlemonPrivateSubnet3
 
   PrivateSubnet4:
     Value: !Ref PrivateSubnet4
     Export:
-      Name: !Sub ${StackAlias}PrivateSubnet4
+      Name: BattlemonPrivateSubnet4
+
+  PrivateSubnet1CIDR:
+    Value: !Ref PrivateSubnet1CIDR
+    Export:
+      Name: BattlemonPrivateSubnet1CIDR

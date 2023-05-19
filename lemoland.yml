@@ -216,7 +216,7 @@ Resources:
               Value: !Ref LemolandGemsContractAddress
             - Name: REFERRAL_CONTRACT_ADDRESS
               Value: !Ref LemolandReferralContractAddress
-            #          Secrets:
+          Secrets:
             - Name: DATABASE_USER
               Value: !Sub
                 - '{{resolve:secretsmanager:${Arn}:SecretString:username}}'

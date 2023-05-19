@@ -30,6 +30,7 @@ Resources:
         GenerateStringKey: "password"
         PasswordLength: 20
         ExcludeCharacters: '"@/\'
+        ExcludePunctuation: true
         IncludeSpace: false
 
   DatabaseSecurityGroup:

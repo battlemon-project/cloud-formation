@@ -281,6 +281,11 @@ Outputs:
     Export:
       Name: BattlemonPrivateSubnet4
 
+  VpcCidr:
+    Value: !Ref VpcCIDR
+    Export:
+      Name: BattlemonVpcCIDR
+
   PrivateSubnet1CIDR:
     Value: !Ref PrivateSubnet1CIDR
     Export:

@@ -228,11 +228,15 @@ Resources:
               Value: !Ref LemolandReferralContractAddress
           Secrets:
             - Name: DATABASE_USER
-              ValueFrom: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:username}}'
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${Arn}:SecretString:username}}'
+                - Arn: !ImportValue BattlemonDatabaseSecret
             - Name: DATABASE_PASSWORD
-              ValueFrom: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}'
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${Arn}:SecretString:password}}'
+                - Arn: !ImportValue BattlemonDatabaseSecret
             - Name: JWT_SECRET
-              Value: !Sub '{{resolve:secretsmanager:${LemolandJwtSecret}:SecretString}}'
+              Value: !Sub '{{resolve:secretsmanager:${JWTSecret}:SecretString}}'
           #            - Name: DISCORD_BOT_TOKEN
           #              Value: !Sub '{{resolve:secretsmanager:${DiscordBotTokenSecret}:SecretString}}'
           #            - Name: BLOCKCHAIN_PROVIDER_URL

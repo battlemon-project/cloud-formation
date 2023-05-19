@@ -95,3 +95,8 @@ Outputs:
     Value: !Ref DatabasePort
     Export:
       Name: BattlemonDatabasePort
+
+  DatabaseSecretArn:
+    Value: !Ref DatabaseSecret
+    Export:
+      Name: BattlemonDatabaseSecret

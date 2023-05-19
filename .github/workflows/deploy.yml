@@ -37,5 +37,4 @@ jobs:
           name: rds-layer-stack
           template: rds.yml
           no-fail-on-empty-changeset: "1"
-          disable-rollback: "1"
           capabilities: CAPABILITY_NAMED_IAM

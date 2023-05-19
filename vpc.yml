@@ -285,3 +285,8 @@ Outputs:
     Value: !Ref PrivateSubnet1CIDR
     Export:
       Name: BattlemonPrivateSubnet1CIDR
+
+  PrivateSubnet2CIDR:
+    Value: !Ref PrivateSubnet2CIDR
+    Export:
+      Name: BattlemonPrivateSubnet2CIDR

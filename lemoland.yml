@@ -218,7 +218,7 @@ Resources:
               Value: !Ref LemolandReferralContractAddress
           Secrets:
             - Name: DATABASE_USER
-              Value: !Sub
+              ValueFrom: !Sub
                 - '{{resolve:secretsmanager:${Arn}:SecretString:username}}'
                 - Arn: !ImportValue BattlemonDatabaseSecret
           #              ValueFrom: !Sub

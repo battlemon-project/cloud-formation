@@ -49,11 +49,33 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       Name: LemolandJWTSecret
-      GenerateSecretString:
-        SecretStringTemplate: "CHANGE ME"
       Tags:
         - Key: Name
           Value: LemolandJWTSecret
+
+  DiscordBotTokenSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: LemolandDiscordBotTokenSecret
+      Tags:
+        - Key: Name
+          Value: LemolandDiscordBotTokenSecret
+
+  BlockchainProviderUrl:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: LemolandBlockchainProviderUrl
+      Tags:
+        - Key: Name
+          Value: LemolandBlockchainProviderUrl
+
+  LemolandServerPrivateKey:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: LemolandServerPrivateKey
+      Tags:
+        - Key: Name
+          Value: LemolandServerPrivateKey
 
   # Application Load Balancer
   ALBSecurityGroup:
@@ -237,12 +259,12 @@ Resources:
                 - Arn: !ImportValue BattlemonDatabaseSecret
             - Name: JWT_SECRET
               Value: !Sub '{{resolve:secretsmanager:${JWTSecret}:SecretString}}'
-          #            - Name: DISCORD_BOT_TOKEN
-          #              Value: !Sub '{{resolve:secretsmanager:${DiscordBotTokenSecret}:SecretString}}'
-          #            - Name: BLOCKCHAIN_PROVIDER_URL
-          #              Value: !Sub '{{resolve:secretsmanager:${BlockchainProviderUrl}:SecretString}}'
-          #            - Name: SERVER_PRIVATE_KEY
-          #              Value: !Sub '{{resolve:secretsmanager:${LemolandServerPrivateKey}:SecretString}}'
+            - Name: DISCORD_BOT_TOKEN
+              Value: !Sub '{{resolve:secretsmanager:${DiscordBotTokenSecret}:SecretString}}'
+            - Name: BLOCKCHAIN_PROVIDER_URL
+              Value: !Sub '{{resolve:secretsmanager:${BlockchainProviderUrl}:SecretString}}'
+            - Name: SERVER_PRIVATE_KEY
+              Value: !Sub '{{resolve:secretsmanager:${LemolandServerPrivateKey}:SecretString}}'
           LogConfiguration:
             LogDriver: awslogs
             Options:

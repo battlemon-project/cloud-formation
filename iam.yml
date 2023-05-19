@@ -19,3 +19,9 @@ Resources:
       Tags:
         - Key: Name
           Value: TaskExecutionRole
+
+Outputs:
+  TaskExecutionRoleArn:
+    Value: !GetAtt TaskExecutionRole.Arn
+    Export:
+      Name: BattlemonTaskExecutionRoleArn

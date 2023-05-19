@@ -79,3 +79,9 @@ Resources:
       PubliclyAccessible: false
       StorageEncrypted: false
       VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]
+
+Outputs:
+  DatabaseInstanceEndpointAddress:
+    Value: !GetAtt DatabaseInstance.Endpoint.Address
+    Export:
+      Name: BattlemonDatabaseInstanceEndpointAddress

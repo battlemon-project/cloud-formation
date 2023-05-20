@@ -248,7 +248,6 @@ Resources:
               ValueFrom: !Sub
                 - '{{resolve:secretsmanager:${Arn}:SecretString}}'
                 - Arn: !ImportValue LemolandBlockchainProviderApiKey
-
           LogConfiguration:
             LogDriver: awslogs
             Options:

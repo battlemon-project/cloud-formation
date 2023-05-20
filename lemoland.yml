@@ -227,7 +227,7 @@ Resources:
               Value: !Ref LemolandBlockchainProviderUrl
           Secrets:
             - Name: DATABASE_PASSWORD
-              Value: !ImportValue BattlemonDatabasePassword
+              ValueFrom: !ImportValue BattlemonDatabasePassword
             - Name: JWT_SECRET
               ValueFrom: !ImportValue LemolandJWTSecret
             - Name: DISCORD_BOT_TOKEN

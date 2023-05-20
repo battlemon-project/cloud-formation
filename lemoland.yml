@@ -43,6 +43,11 @@ Parameters:
     Type: String
     Default: '0x62c99ae88D1048d65aFF47a97f976c8F174B5Ee5'
 
+  LemolandBlockchainProviderUrl:
+    Description: Blockchain provider url
+    Type: String
+    Default: 'https://consensys-zkevm-goerli-prealpha.infura.io/v3/'
+
 Resources:
   # Application Load Balancer
   ALBSecurityGroup:
@@ -216,6 +221,8 @@ Resources:
               Value: !Ref LemolandGemsContractAddress
             - Name: REFERRAL_CONTRACT_ADDRESS
               Value: !Ref LemolandReferralContractAddress
+            - Name: BLOCKCHAIN_PROVIDER_URL
+              Value: !Ref LemolandBlockchainProviderUrl
           Secrets:
             - Name: DATABASE_USER
               ValueFrom: !Sub
@@ -233,14 +240,15 @@ Resources:
               ValueFrom: !Sub
                 - '{{resolve:secretsmanager:${Arn}:SecretString}}'
                 - Arn: !ImportValue LemolandDiscordBotToken
-            - Name: BLOCKCHAIN_PROVIDER_URL
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
-                - Arn: !ImportValue LemolandBlockchainProviderUrl
             - Name: SERVER_PRIVATE_KEY
               ValueFrom: !Sub
                 - '{{resolve:secretsmanager:${Arn}:SecretString}}'
                 - Arn: !ImportValue LemolandServerPrivateKey
+            - Name: BLOCKCHAIN_PROVIDER_API_KEY
+              ValueFrom: !Sub
+                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
+                - Arn: !ImportValue LemolandBlockchainProviderApiKey
+
           LogConfiguration:
             LogDriver: awslogs
             Options:

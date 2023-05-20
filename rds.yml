@@ -30,8 +30,12 @@ Resources:
         GenerateStringKey: "password"
         PasswordLength: 20
         ExcludeCharacters: '"@/\'
-        ExcludePunctuation: true
-        IncludeSpace: false
+
+  DatabasePassword:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: BattlemonDatabasePassword
+      SecretString: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}'
 
   DatabaseSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -74,8 +78,8 @@ Resources:
       DBSubnetGroupName: !Ref DatabaseSubnetGroup
       Engine: postgres
       EngineVersion: 15.2
-      MasterUsername: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:username}}'
-      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}'
+      MasterUsername: !Ref DatabaseUsername
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DatabasePassword}:SecretString}}'
       MultiAZ: false
       Port: !Ref DatabasePort
       PubliclyAccessible: false
@@ -88,6 +92,11 @@ Outputs:
     Export:
       Name: BattlemonDatabaseInstanceEndpointAddress
 
+  DatabaseUserName:
+    Value: !Ref DatabaseUsername
+    Export:
+      Name: BattlemonDatabaseUsername
+
   DatabaseName:
     Value: !Ref DatabaseName
     Export:
@@ -98,7 +107,7 @@ Outputs:
     Export:
       Name: BattlemonDatabasePort
 
-  DatabaseSecretArn:
-    Value: !Ref DatabaseSecret
+  DatabasePasswordArn:
+    Value: !Ref DatabasePassword
     Export:
-      Name: BattlemonDatabaseSecret
+      Name: BattlemonDatabasePassword

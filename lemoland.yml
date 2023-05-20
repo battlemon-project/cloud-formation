@@ -205,6 +205,8 @@ Resources:
               Value: !Ref LemolandBackendPort
             - Name: DATABASE_HOST
               Value: !ImportValue BattlemonDatabaseInstanceEndpointAddress
+            - Name: DATABASE_USER
+              Value: !ImportValue BattlemonDatabaseUsername
             - Name: DATABASE_NAME
               Value: !ImportValue BattlemonDatabaseName
             - Name: DATABASE_PORT
@@ -224,30 +226,16 @@ Resources:
             - Name: BLOCKCHAIN_PROVIDER_URL
               Value: !Ref LemolandBlockchainProviderUrl
           Secrets:
-            - Name: DATABASE_USER
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString:username}}'
-                - Arn: !ImportValue BattlemonDatabaseSecret
             - Name: DATABASE_PASSWORD
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString:password}}'
-                - Arn: !ImportValue BattlemonDatabaseSecret
+              Value: !ImportValue BattlemonDatabasePassword
             - Name: JWT_SECRET
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
-                - Arn: !ImportValue LemolandJWTSecret
+              ValueFrom: !ImportValue LemolandJWTSecret
             - Name: DISCORD_BOT_TOKEN
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
-                - Arn: !ImportValue LemolandDiscordBotToken
+              ValueFrom: !ImportValue LemolandDiscordBotToken
             - Name: SERVER_PRIVATE_KEY
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
-                - Arn: !ImportValue LemolandServerPrivateKey
+              ValueFrom: !ImportValue LemolandServerPrivateKey
             - Name: BLOCKCHAIN_PROVIDER_API_KEY
-              ValueFrom: !Sub
-                - '{{resolve:secretsmanager:${Arn}:SecretString}}'
-                - Arn: !ImportValue LemolandBlockchainProviderApiKey
+              ValueFrom: !ImportValue LemolandBlockchainProviderApiKey
           LogConfiguration:
             LogDriver: awslogs
             Options:

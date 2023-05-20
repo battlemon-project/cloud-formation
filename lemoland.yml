@@ -16,7 +16,7 @@ Parameters:
   LemolandLogLevel:
     Description: Log level for lemoland service
     Type: String
-    Default: info
+    Default: trace
 
   LemolandServeSwagger:
     Description: Serve Swagger

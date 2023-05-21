@@ -3,11 +3,6 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Lemoland layer
 
 Parameters:
-  LemolandBackendPort:
-    Description: Lemoland backend port
-    Type: Number
-    Default: 3000
-
   LemolandBackendECRRepositoryURI:
     Description: Lemoland backend repository's URI of Amazon Container Registry
     Type: String
@@ -49,79 +44,6 @@ Parameters:
     Default: 'https://consensys-zkevm-goerli-prealpha.infura.io/v3/'
 
 Resources:
-  # Application Load Balancer
-  ALBSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable HTTP and HTTPS access on port 80/443
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-      VpcId: !ImportValue BattlemonVpcId
-      Tags:
-        - Key: Name
-          Value: ALBSecurityGroup
-
-  ApplicationLoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Name: ALB
-      SecurityGroups: [ !Ref ALBSecurityGroup ]
-      Subnets: [ !ImportValue BattlemonPublicSubnet1, !ImportValue BattlemonPublicSubnet2 ]
-
-  ALBListenerNoSslCertificate:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        #        - Type: redirect
-        #          RedirectConfig:
-        #            Host: "#{host}"
-        #            Path: "/#{path}"
-        #            Port: "443"
-        #            Protocol: HTTPS
-        #            StatusCode: HTTP_301
-        - Type: forward
-          TargetGroupArn: !Ref ALBTargetGroup
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 80
-      Protocol: HTTP
-
-  # Implement it later when issue certs for domain
-  #  ALBListenerSslCertificate:
-  #    Type: AWS::ElasticLoadBalancingV2::Listener
-  #    Properties:
-  #      Certificates:
-  #        - CertificateArn: !Ref AcmCertificate
-  #      DefaultActions:
-  #        - Type: forward
-  #          TargetGroupArn: !Ref ALBTargetGroup
-  #      LoadBalancerArn: !Ref ApplicationLoadBalancer
-  #      Port: 443
-  #      Protocol: HTTPS
-
-  ALBTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      HealthCheckIntervalSeconds: 10
-      HealthCheckPath: /healthcheck
-      HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 2
-      Matcher:
-        HttpCode: "200"
-      Port: !Ref LemolandBackendPort
-      Name: LemolandBackend
-      Protocol: HTTP
-      TargetType: ip
-      UnhealthyThresholdCount: 5
-      VpcId:
-        !ImportValue BattlemonVpcId
-
   # Backend cluster
   LemolandSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -129,8 +51,8 @@ Resources:
       GroupDescription: Enable HTTP access via ALB on port 3000 by default, but can be overwritten by LemolandBackendPort parameter
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: !Ref LemolandBackendPort
-          ToPort: !Ref LemolandBackendPort
+          FromPort: !ImportValue LemolandBackendPort
+          ToPort: !ImportValue LemolandBackendPort
           CidrIp: !ImportValue BattlemonVpcCIDR
       VpcId: !ImportValue BattlemonVpcId
       Tags:
@@ -160,7 +82,6 @@ Resources:
   # Lemoland service
   LemolandBackendService:
     Type: AWS::ECS::Service
-    DependsOn: [ ALBListenerNoSslCertificate ]
     Properties:
       ServiceName: LemolandBackendService
       Cluster: !Ref LemolandBackendCluster
@@ -174,8 +95,8 @@ Resources:
           SecurityGroups: [ !Ref LemolandSecurityGroup ]
       LoadBalancers:
         - ContainerName: LemolandBackend
-          ContainerPort: !Ref LemolandBackendPort
-          TargetGroupArn: !Ref ALBTargetGroup
+          ContainerPort: !ImportValue LemolandBackendPort
+          TargetGroupArn: !ImportValue ALBTargetGroup
       Tags:
         - Key: Name
           Value: LemolandBackendService
@@ -198,11 +119,11 @@ Resources:
           Image: !Ref LemolandBackendECRRepositoryURI
           Essential: true
           PortMappings:
-            - ContainerPort: !Ref LemolandBackendPort
+            - ContainerPort: !ImportValue LemolandBackendPort
               Protocol: tcp
           Environment:
             - Name: PORT
-              Value: !Ref LemolandBackendPort
+              Value: !ImportValue LemolandBackendPort
             - Name: DATABASE_HOST
               Value: !ImportValue BattlemonDatabaseInstanceEndpointAddress
             - Name: DATABASE_USER

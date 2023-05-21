@@ -58,7 +58,15 @@ jobs:
       - name: Deploy lemoland resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: lemoland-layer-stack
-          template: lemoland.yml
+          name: application-load-balancer-layer-stack
+          template: alb.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Deploy lemoland resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: lemoland-service-layer-stack
+          template: lemoland-service.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM

@@ -192,7 +192,7 @@ Resources:
       Cpu: 256
       Memory: 0.5 GB
       RuntimePlatform:
-        CpuArchitecture: ARM64
+        CpuArchitecture: X86_64
         OperatingSystemFamily: LINUX
       Tags:
         - Key: Name

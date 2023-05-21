@@ -55,10 +55,17 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy lemoland resources to stack to AWS CloudFormation
+#      - name: Deploy lemoland resources to stack to AWS CloudFormation
+#        uses: aws-actions/aws-cloudformation-github-deploy@v1
+#        with:
+#          name: lemoland-layer-stack
+#          template: lemoland.yml
+#          no-fail-on-empty-changeset: "1"
+#          capabilities: CAPABILITY_NAMED_IAM
+      - name: Deploy test resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: lemoland-layer-stack
-          template: lemoland.yml
+          name: test-layer-stack
+          template: test-service.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM

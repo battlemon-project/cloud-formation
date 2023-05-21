@@ -14,79 +14,6 @@ Parameters:
     Default: 8000
 
 Resources:
-  # Application Load Balancer
-  ALBSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Enable HTTP and HTTPS access on port 80/443
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-      VpcId: !ImportValue BattlemonVpcId
-      Tags:
-        - Key: Name
-          Value: ALBSecurityGroup
-
-  ApplicationLoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Name: ALB
-      SecurityGroups: [ !Ref ALBSecurityGroup ]
-      Subnets: [ !ImportValue BattlemonPublicSubnet1, !ImportValue BattlemonPublicSubnet2 ]
-
-  ALBListenerNoSslCertificate:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      DefaultActions:
-        #        - Type: redirect
-        #          RedirectConfig:
-        #            Host: "#{host}"
-        #            Path: "/#{path}"
-        #            Port: "443"
-        #            Protocol: HTTPS
-        #            StatusCode: HTTP_301
-        - Type: forward
-          TargetGroupArn: !Ref ALBTargetGroup
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 80
-      Protocol: HTTP
-
-  # Implement it later when issue certs for domain
-  #  ALBListenerSslCertificate:
-  #    Type: AWS::ElasticLoadBalancingV2::Listener
-  #    Properties:
-  #      Certificates:
-  #        - CertificateArn: !Ref AcmCertificate
-  #      DefaultActions:
-  #        - Type: forward
-  #          TargetGroupArn: !Ref ALBTargetGroup
-  #      LoadBalancerArn: !Ref ApplicationLoadBalancer
-  #      Port: 443
-  #      Protocol: HTTPS
-
-  ALBTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      HealthCheckIntervalSeconds: 10
-      HealthCheckPath: /healthcheck
-      HealthCheckTimeoutSeconds: 5
-      HealthyThresholdCount: 2
-      Matcher:
-        HttpCode: "200"
-      Port: !Ref TestBackendPort
-      Name: TestBackend
-      Protocol: HTTP
-      TargetType: ip
-      UnhealthyThresholdCount: 5
-      VpcId:
-        !ImportValue BattlemonVpcId
-
   # Backend cluster
   TestSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -125,7 +52,6 @@ Resources:
   # Test service
   TestBackendService:
     Type: AWS::ECS::Service
-    DependsOn: [ ALBListenerNoSslCertificate ]
     Properties:
       ServiceName: TestBackendService
       Cluster: !Ref TestBackendCluster
@@ -140,7 +66,7 @@ Resources:
       LoadBalancers:
         - ContainerName: TestBackend
           ContainerPort: !Ref TestBackendPort
-          TargetGroupArn: !Ref ALBTargetGroup
+          TargetGroupArn: !ImportValue ALBTargetGroup
       Tags:
         - Key: Name
           Value: TestBackendService

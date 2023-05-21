@@ -13,26 +13,6 @@ Parameters:
     Type: Number
     Default: 8000
 
-  TestAccessKeyContractAddress:
-    Description: AccessKey contract address
-    Type: String
-    Default: '0x715418aD6e0CE69a5FfA72Eb34ECc04d712Cd106'
-
-  TestGemsContractAddress:
-    Description: Gems contract address
-    Type: String
-    Default: '0xeAe2c6b00C57DC313b1B6d46094fE032Fe1740e5'
-
-  TestReferralContractAddress:
-    Description: Referral contract address
-    Type: String
-    Default: '0x62c99ae88D1048d65aFF47a97f976c8F174B5Ee5'
-
-  TestBlockchainProviderUrl:
-    Description: Blockchain provider url
-    Type: String
-    Default: 'https://consensys-zkevm-goerli-prealpha.infura.io/v3/'
-
 Resources:
   # Application Load Balancer
   ALBSecurityGroup:

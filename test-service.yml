@@ -166,7 +166,7 @@ Resources:
             - ContainerPort: !Ref TestBackendPort
               Protocol: tcp
           Environment:
-            - Name: APP_APP__PORT
+            - Name: APP_APP__HOST
               Value: "0.0.0.0"
             - Name: APP_APP__PORT
               Value: !Ref TestBackendPort

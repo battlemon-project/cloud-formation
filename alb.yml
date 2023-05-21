@@ -44,29 +44,32 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
-        - Type: redirect
-          RedirectConfig:
-            Host: "#{host}"
-            Path: "/#{path}"
-            Query: "#{query}"
-            Port: "443"
-            Protocol: HTTPS
-            StatusCode: HTTP_301
+#        - Type: redirect
+#          RedirectConfig:
+#            Host: "#{host}"
+#            Path: "/#{path}"
+#            Query: "#{query}"
+#            Port: "443"
+#            Protocol: HTTPS
+#            StatusCode: HTTP_301
+
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
       LoadBalancerArn: !Ref ApplicationLoadBalancer
       Port: 80
       Protocol: HTTP
 
-  ALBListenerSsl:
-    Type: AWS::ElasticLoadBalancingV2::Listener
-    Properties:
-      Certificates:
-        - CertificateArn: !Ref AcmCertificate
-      DefaultActions:
-        - Type: forward
-          TargetGroupArn: !Ref ALBTargetGroup
-      LoadBalancerArn: !Ref ApplicationLoadBalancer
-      Port: 443
-      Protocol: HTTPS
+#  ALBListenerSsl:
+#    Type: AWS::ElasticLoadBalancingV2::Listener
+#    Properties:
+#      Certificates:
+#        - CertificateArn: !Ref AcmCertificate
+#      DefaultActions:
+#        - Type: forward
+#          TargetGroupArn: !Ref ALBTargetGroup
+#      LoadBalancerArn: !Ref ApplicationLoadBalancer
+#      Port: 443
+#      Protocol: HTTPS
 
   ALBTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup

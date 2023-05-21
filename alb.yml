@@ -52,7 +52,6 @@ Resources:
             Port: "443"
             Protocol: HTTPS
             StatusCode: HTTP_301
-          TargetGroupArn: !Ref ALBTargetGroup
       LoadBalancerArn: !Ref ApplicationLoadBalancer
       Port: 80
       Protocol: HTTP

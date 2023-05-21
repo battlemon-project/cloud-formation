@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: RDS layer
+
+Parameters:
+  DatabaseUsername:
+    Description: Database username
+    Type: String
+    Default: postgres
+
+  DatabaseName:
+    Description: Database name
+    Type: String
+    Default: postgres
+
+  DatabasePort:
+    Description: Database port
+    Type: Number
+    Default: 5432
+
+
+Resources:
+  # Database
+  DatabaseSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: BattlemonDatabaseSecret
+      GenerateSecretString:
+        SecretStringTemplate: !Sub '{"username": "${DatabaseUsername}"}'
+        GenerateStringKey: "password"
+        PasswordLength: 20
+        ExcludeCharacters: '"@/\'
+
+  DatabasePassword:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: BattlemonDatabasePassword
+      SecretString: !Sub '{{resolve:secretsmanager:${DatabaseSecret}:SecretString:password}}'
+
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable database access on port (default 5432) only from Private Subnets 1 and 2
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref DatabasePort
+          ToPort: !Ref DatabasePort
+          CidrIp: !ImportValue BattlemonPrivateSubnet1CIDR
+        - IpProtocol: tcp
+          FromPort: !Ref DatabasePort
+          ToPort: !Ref DatabasePort
+          CidrIp: !ImportValue BattlemonPrivateSubnet2CIDR
+      VpcId: !ImportValue BattlemonVpcId
+      Tags:
+        - Key: Name
+          Value: BattlemonDatabaseSecurityGroup
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet group for RDS database
+      SubnetIds:
+        - !ImportValue BattlemonPrivateSubnet3
+        - !ImportValue BattlemonPrivateSubnet4
+      Tags:
+        - Key: Name
+          Value: BattlemonDatabaseSubnetGroup
+
+  DatabaseInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: 20
+      AvailabilityZone: !Select [ 0, !GetAZs  "" ]
+      BackupRetentionPeriod: 0
+      DBInstanceClass: db.t3.micro
+      DBInstanceIdentifier: BattlemonDatabaseInstance
+      DBName: !Ref DatabaseName
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      Engine: postgres
+      EngineVersion: 14.6
+      MasterUsername: !Ref DatabaseUsername
+      MasterUserPassword: !Sub '{{resolve:secretsmanager:${DatabasePassword}:SecretString}}'
+      MultiAZ: false
+      Port: !Ref DatabasePort
+      PubliclyAccessible: false
+      StorageEncrypted: false
+      VPCSecurityGroups: [ !Ref DatabaseSecurityGroup ]
+
+Outputs:
+  DatabaseInstanceEndpointAddress:
+    Value: !GetAtt DatabaseInstance.Endpoint.Address
+    Export:
+      Name: BattlemonDatabaseInstanceEndpointAddress
+
+  DatabaseUserName:
+    Value: !Ref DatabaseUsername
+    Export:
+      Name: BattlemonDatabaseUsername
+
+  DatabaseName:
+    Value: !Ref DatabaseName
+    Export:
+      Name: BattlemonDatabaseName
+
+  DatabasePort:
+    Value: !Ref DatabasePort
+    Export:
+      Name: BattlemonDatabasePort
+
+  DatabasePasswordArn:
+    Value: !Ref DatabasePassword
+    Export:
+      Name: BattlemonDatabasePassword

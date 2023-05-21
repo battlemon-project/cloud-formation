@@ -1,0 +1,97 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Application load-balancer, target-group listeners Lemoland layer
+
+Parameters:
+  LemolandBackendPort:
+    Description: Lemoland backend port
+    Type: Number
+    Default: 3000
+
+  AcmCertificate:
+    Description: ACM certificate for ssl connection
+    Type: String
+    Default: arn:aws:acm:eu-central-1:987666890397:certificate/00ba2edc-6bc8-4f63-98b6-00d65ccf6df7
+
+Resources:
+  # Application Load Balancer
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP and HTTPS access on port 80/443
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      VpcId: !ImportValue BattlemonVpcId
+      Tags:
+        - Key: Name
+          Value: ALBSecurityGroup
+
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: ALB
+      SecurityGroups: [ !Ref ALBSecurityGroup ]
+      Subnets: [ !ImportValue BattlemonPublicSubnet1, !ImportValue BattlemonPublicSubnet2 ]
+
+  ALBListenerNoSsl:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig:
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+            Port: "443"
+            Protocol: HTTPS
+            StatusCode: HTTP_301
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ALBListenerSsl:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref AcmCertificate
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ALBTargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+
+  ALBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /healthcheck
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 2
+      Matcher:
+        HttpCode: "200"
+      Port: !Ref LemolandBackendPort
+      Name: LemolandBackend
+      Protocol: HTTP
+      TargetType: ip
+      UnhealthyThresholdCount: 5
+      VpcId:
+        !ImportValue BattlemonVpcId
+
+Outputs:
+  LemolandBackendPort:
+    Value: !Ref LemolandBackendPort
+    Export:
+      Name: LemolandBackendPort
+
+  ALBTargetGroup:
+    Value: !Ref ALBTargetGroup
+    Export:
+      Name: ALBTargetGroup

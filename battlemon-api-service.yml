@@ -152,3 +152,21 @@ Resources:
       Tags:
         - Key: Name
           Value: BattlemonAPIBackendTaskDefinition
+
+#todo:
+#  DiscordBotToken:
+#    Type: AWS::SecretsManager::Secret
+#    Properties:
+#      Name: BattlemonAPIDiscordBotTokenSecret
+#      SecretString: "CHANGE_ME"
+#      Tags:
+#        - Key: Name
+#          Value: BattlemonAPIDiscordBotTokenSecret
+#  DiscordBotToken:
+#    Type: AWS::SecretsManager::Secret
+#    Properties:
+#      Name: BattlemonAPIDiscordBotTokenSecret
+#      SecretString: "CHANGE_ME"
+#      Tags:
+#        - Key: Name
+#          Value: BattlemonAPIDiscordBotTokenSecret

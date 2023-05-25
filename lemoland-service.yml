@@ -59,32 +59,12 @@ Resources:
         - Key: Name
           Value: LemolandSecurityGroup
 
-  LemolandBackendCluster:
-    Type: AWS::ECS::Cluster
-    Properties:
-      ClusterName: LemolandBackendCluster
-      CapacityProviders:
-        - FARGATE
-        - FARGATE_SPOT
-      DefaultCapacityProviderStrategy:
-        - CapacityProvider: FARGATE
-          Weight: 1
-        - CapacityProvider: FARGATE_SPOT
-          Weight: 1
-      ClusterSettings:
-        - Name: containerInsights
-          Value: enabled
-      Tags:
-        - Key: Name
-          Value: LemolandBackendCluster
-
-
   # Lemoland service
   LemolandBackendService:
     Type: AWS::ECS::Service
     Properties:
       ServiceName: LemolandBackendService
-      Cluster: !Ref LemolandBackendCluster
+      Cluster: !ImportValue BattlemonBackendCluster
       TaskDefinition: !Ref LemolandTaskDefinition
       DesiredCount: 2
       LaunchType: FARGATE

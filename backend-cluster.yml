@@ -25,5 +25,5 @@ Resources:
 Outputs:
   BattlemonBackendCluster:
     Value: !Ref BattlemonBackendCluster
-    Exports:
+    Export:
       Name: BattlemonBackendCluster

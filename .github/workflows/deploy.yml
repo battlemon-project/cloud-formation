@@ -46,15 +46,15 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy lemoland secrets resources to stack to AWS CloudFormation
+      - name: Deploy battlemon-api secrets resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: lemoland-secrets-layer-stack
-          template: lemoland-secrets.yml
+          name: battlemon-api-secrets-layer-stack
+          template: battlemon-api-secrets.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy lemoland resources to stack to AWS CloudFormation
+      - name: Deploy battlemon-api load-balanacer resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: application-load-balancer-layer-stack

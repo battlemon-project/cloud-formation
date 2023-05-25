@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: Application load-balancer, target-group listeners Lemoland layer
+Description: Application load-balancer, target-group, listeners for Battlemon API service layer
 
 Parameters:
   BattlemonAPIBackendPort:
@@ -77,8 +77,8 @@ Resources:
       HealthyThresholdCount: 2
       Matcher:
         HttpCode: "200"
-      Port: BattlemonAPIBackendPort
-      Name: LemolandBackend
+      Port: !Ref BattlemonAPIBackendPort
+      Name: BattlemonAPIBackend
       Protocol: HTTP
       TargetType: ip
       UnhealthyThresholdCount: 5
@@ -87,7 +87,7 @@ Resources:
 
 Outputs:
   BattlemonAPIBackendPort:
-    Value: BattlemonAPIBackendPort
+    Value: !Ref BattlemonAPIBackendPort
     Export:
       Name: BattlemonAPIBackendPort
 

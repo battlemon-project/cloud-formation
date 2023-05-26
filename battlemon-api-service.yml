@@ -152,7 +152,11 @@ Resources:
       Tags:
         - Key: Name
           Value: BattlemonAPIBackendTaskDefinition
-
+Outputs:
+  BattlemonAPIGRPCPort:
+    Value: !Ref BattlemonAPIGRPCPort
+    Export:
+      Name: BattlemonAPIGRPCPort
 #todo:
 #  DiscordBotToken:
 #    Type: AWS::SecretsManager::Secret

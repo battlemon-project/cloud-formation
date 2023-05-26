@@ -42,7 +42,7 @@ Resources:
     Type: AWS::ECS::Service
     Properties:
       ServiceName: BattlemonListenerService
-      Cluster: !ImportValue BattlemonCluster
+      Cluster: !ImportValue BattlemonBackendCluster
       TaskDefinition: !Ref TaskDefinition
       DesiredCount: 1
       LaunchType: FARGATE

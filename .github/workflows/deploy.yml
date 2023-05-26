@@ -70,18 +70,18 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy battlemon-listener secrets resources to stack to AWS CloudFormation
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        with:
-          name: battlemon-listener-secrets-layer-stack
-          template: battlemon-listener-secrets.yml
-          no-fail-on-empty-changeset: "1"
-          capabilities: CAPABILITY_NAMED_IAM
-
       - name: Deploy battlemon-api resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: battlemon-api-service-layer-stack
           template: battlemon-api-service.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Deploy battlemon-listener secrets resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: listener-secrets-layer-stack
+          template: listener-secrets.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM

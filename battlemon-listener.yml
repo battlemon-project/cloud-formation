@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Battlemon Listener layer
+
+Parameters:
+  Port:
+    Description: Battlemon listener port
+    Type: Number
+    Default: 3000
+
+  ECRRepositoryURI:
+    Description: Battlemon listener repository's URI of Amazon Container Registry
+    Type: String
+    Default: "987666890397.dkr.ecr.eu-central-1.amazonaws.com/battlemon-listener:latest"
+
+  LogLevel:
+    Description: Log level for battlemon listener service
+    Type: String
+    Default: info
+
+  DiscordGuildId:
+    Description: Id of battlemon discord server
+    Type: String
+    Default: 893433519110488064
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable HTTP access via ALB on port 3000 by default, but can be overwritten by Port parameter
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref Port
+          ToPort: !Ref Port
+          CidrIp: !ImportValue BattlemonVpcCIDR
+      VpcId: !ImportValue BattlemonVpcId
+      Tags:
+        - Key: Name
+          Value: BattlemonListenerSecurityGroup
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: BattlemonListenerService
+      Cluster: !ImportValue BattlemonCluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: DISABLED
+          Subnets: [ !ImportValue BattlemonPrivateSubnet1, !ImportValue BattlemonPrivateSubnet2 ]
+          SecurityGroups: [ !Ref SecurityGroup ]
+      Tags:
+        - Key: Name
+          Value: BattlemonListenerService
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/battlemon-listener-backend
+      RetentionInDays: 7
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [ FARGATE ]
+      Family: BattlemonListener
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !ImportValue BattlemonTaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: BattlemonListener
+          Image: !Ref ECRRepositoryURI
+          Essential: true
+          PortMappings:
+            - ContainerPort: !Ref Port
+              Protocol: tcp
+          Environment:
+            - Name: PORT
+              Value: !Ref Port
+            - Name: DATABASE_HOST
+              Value: !ImportValue BattlemonDatabaseInstanceEndpointAddress
+            - Name: DATABASE_USER
+              Value: !ImportValue BattlemonDatabaseUsername
+            - Name: DATABASE_NAME
+              Value: !ImportValue BattlemonDatabaseName
+            - Name: DATABASE_PORT
+              Value: !ImportValue BattlemonDatabasePort
+            - Name: LOG_LEVEL
+              Value: !Ref LogLevel
+            - Name: DISCORD_GUILD_ID
+              Value: !Ref DiscordGuildId
+            - Name: BATTLEMON_GRPC_API_URL
+              Value: !Sub
+                - api:${Port}
+                - Port: !ImportValue BattlemonAPIGRPCPort
+          Secrets:
+            - Name: DATABASE_PASSWORD
+              ValueFrom: !ImportValue BattlemonDatabasePassword
+            - Name: DISCORD_BOT_TOKEN
+              ValueFrom: !ImportValue BattlemonListenerDiscordBotToken
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: ecs
+      Cpu: 256
+      Memory: 0.5 GB
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+        OperatingSystemFamily: LINUX
+      Tags:
+        - Key: Name
+          Value: BattlemonListenerTaskDefinition

@@ -46,22 +46,6 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy lemoland secrets resources to stack to AWS CloudFormation
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        with:
-          name: lemoland-secrets-layer-stack
-          template: lemoland-secrets.yml
-          no-fail-on-empty-changeset: "1"
-          capabilities: CAPABILITY_NAMED_IAM
-
-      - name: Deploy lemoland resources to stack to AWS CloudFormation
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        with:
-          name: application-load-balancer-layer-stack
-          template: alb.yml
-          no-fail-on-empty-changeset: "1"
-          capabilities: CAPABILITY_NAMED_IAM
-
       - name: Deploy cluster resource to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
@@ -70,10 +54,50 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy lemoland resources to stack to AWS CloudFormation
+      - name: Deploy battlemon-api secrets resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: lemoland-service-layer-stack
-          template: lemoland-service.yml
+          name: battlemon-api-secrets-layer-stack
+          template: battlemon-api-secrets.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Deploy battlemon-api load-balanacer resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: application-load-balancer-layer-stack
+          template: alb.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Deploy battlemon's services discovery resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: battlemon-service-discovery-layer-stack
+          template: service-discovery.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Deploy battlemon-api resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: battlemon-api-service-layer-stack
+          template: battlemon-api-service.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Deploy battlemon-listener secrets resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: listener-secrets-layer-stack
+          template: listener-secrets.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
+      - name: Deploy battlemon-listener service resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: battlemon-listener-service-layer-stack
+          template: battlemon-listener-service.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM

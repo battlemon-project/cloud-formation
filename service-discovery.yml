@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Service discovery
+
+Parameters:
+  BattlemonDomainName:
+    Description: Domain name for all backend battlemon services
+    Type: String
+    Default: battlemon.ns
+
+Resources:
+  ServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Description: Namespace for battlemon backend services
+      Name: !Ref BattlemonDomainName
+      Vpc: !ImportValue BattlemonVpcId
+
+  BattlemonAPIDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      DnsConfig:
+        DnsRecords:
+          - TTL: 10
+            Type: A
+        RoutingPolicy: MULTIVALUE
+      Name: api
+      NamespaceId: !Ref ServiceDiscoveryNamespace
+
+Outputs:
+  BattlemonAPIDiscoveryService:
+    Value: !GetAtt BattlemonAPIDiscoveryService.Arn
+    Export:
+      Name: BattlemonAPIDiscoveryService
+
+  BattlemonAPIDomain:
+    Value: !Sub ${BattlemonAPIDiscoveryService.Name}.${BattlemonDomainName}
+    Export:
+      Name: BattlemonAPIEndpoint

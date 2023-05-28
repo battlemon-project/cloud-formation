@@ -67,6 +67,8 @@ Resources:
     Type: AWS::ECS::Service
     Properties:
       ServiceName: BattlemonAPIBackendService
+      ServiceRegistries:
+        - RegistryArn: !ImportValue BattlemonAPIDiscoveryService
       Cluster: !ImportValue BattlemonBackendCluster
       TaskDefinition: !Ref BattlemonApiTaskDefinition
       DesiredCount: 2

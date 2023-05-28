@@ -70,6 +70,14 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
+      - name: Deploy battlemon's services discovery resources to stack to AWS CloudFormation
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: battlemon-service-discovery-layer-stack
+          template: service-discovery.yml
+          no-fail-on-empty-changeset: "1"
+          capabilities: CAPABILITY_NAMED_IAM
+
       - name: Deploy battlemon-api resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:

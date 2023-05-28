@@ -92,8 +92,9 @@ Resources:
               Value: !Ref DiscordGuildId
             - Name: BATTLEMON_GRPC_API_URL
               Value: !Sub
-                - api:${Port}
-                - Port: !ImportValue BattlemonAPIGRPCPort
+                - ${Endpoint}:${Port}
+                - Endpoint: !ImportValue BattlemonAPIEndpoint
+                  Port: !ImportValue BattlemonAPIGRPCPort
           Secrets:
             - Name: DATABASE_PASSWORD
               ValueFrom: !ImportValue BattlemonDatabasePassword

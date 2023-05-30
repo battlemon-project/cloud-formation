@@ -41,7 +41,7 @@ Parameters:
   BattlemonAPIBlockchainProviderUrl:
     Description: Blockchain provider url
     Type: String
-    Default: 'https://rpc.goerli.linea.build'
+    Default: 'https://linea-goerli.infura.io/v3/'
 
 Resources:
   BattlemonAPISecurityGroup:
@@ -138,8 +138,8 @@ Resources:
               ValueFrom: !ImportValue BattlemonAPIJWTSecret
             - Name: SERVER_PRIVATE_KEY
               ValueFrom: !ImportValue BattlemonAPIServerPrivateKey
-          #            - Name: BLOCKCHAIN_PROVIDER_API_KEY
-          #              ValueFrom: !ImportValue BattlemonAPIBlockchainProviderApiKey
+            - Name: BLOCKCHAIN_PROVIDER_API_KEY
+              ValueFrom: !ImportValue BattlemonAPIBlockchainProviderApiKey
           LogConfiguration:
             LogDriver: awslogs
             Options:

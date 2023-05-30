@@ -101,6 +101,8 @@ Resources:
               Value: !ImportValue BattlemonAPIAccessKeyContractAddress
             - Name: GEMS_CONTRACT_ADDRESS
               Value: !ImportValue BattlemonAPIGemsContractAddress
+            - Name: REFERRAL_CONTRACT_ADDRESS
+              Value: !ImportValue BattlemonAPIReferralContractAddress
           Secrets:
             - Name: DATABASE_PASSWORD
               ValueFrom: !ImportValue BattlemonDatabasePassword

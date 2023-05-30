@@ -99,6 +99,8 @@ Resources:
               Value: !ImportValue BattlemonAPIBlockchainProviderUrl
             - Name: ACCESS_KEY_CONTRACT_ADDRESS
               Value: !ImportValue BattlemonAPIAccessKeyContractAddress
+            - Name: GEMS_CONTRACT_ADDRESS
+              Value: !ImportValue BattlemonAPIGemsContractAddress
           Secrets:
             - Name: DATABASE_PASSWORD
               ValueFrom: !ImportValue BattlemonDatabasePassword

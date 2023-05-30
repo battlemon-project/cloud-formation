@@ -164,3 +164,8 @@ Outputs:
     Value: !Ref BattlemonAPIBlockchainProviderUrl
     Export:
       Name: BattlemonAPIBlockchainProviderUrl
+
+  BattlemonAPIAccessKeyContractAddress:
+    Value: !Ref BattlemonAPIAccessKeyContractAddress
+    Export:
+      Name: BattlemonAPIAccessKeyContractAddress

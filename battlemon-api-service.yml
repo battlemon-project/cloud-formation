@@ -169,3 +169,8 @@ Outputs:
     Value: !Ref BattlemonAPIAccessKeyContractAddress
     Export:
       Name: BattlemonAPIAccessKeyContractAddress
+
+  BattlemonAPIGemsContractAddress:
+    Value: !Ref BattlemonAPIGemsContractAddress
+    Export:
+      Name: BattlemonAPIGemsContractAddress

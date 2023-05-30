@@ -6,7 +6,7 @@ Parameters:
   BattlemonDomainName:
     Description: Domain name for all backend battlemon services
     Type: String
-    Default: battlemon.ns
+    Default: battlemon.internal
 
 Resources:
   ServiceDiscoveryNamespace:

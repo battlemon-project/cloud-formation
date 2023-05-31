@@ -95,11 +95,23 @@ Resources:
                 - ${Endpoint}:${Port}
                 - Endpoint: !ImportValue BattlemonAPIEndpoint
                   Port: !ImportValue BattlemonAPIGRPCPort
+            - Name: BLOCKCHAIN_PROVIDER_URL
+              Value: !ImportValue BattlemonAPIBlockchainProviderUrl
+            - Name: ACCESS_KEY_CONTRACT_ADDRESS
+              Value: !ImportValue BattlemonAPIAccessKeyContractAddress
+            - Name: GEMS_CONTRACT_ADDRESS
+              Value: !ImportValue BattlemonAPIGemsContractAddress
+            - Name: REFERRAL_CONTRACT_ADDRESS
+              Value: !ImportValue BattlemonAPIReferralContractAddress
           Secrets:
             - Name: DATABASE_PASSWORD
               ValueFrom: !ImportValue BattlemonDatabasePassword
             - Name: DISCORD_BOT_TOKEN
               ValueFrom: !ImportValue BattlemonListenerDiscordBotToken
+            - Name: SERVER_PRIVATE_KEY
+              ValueFrom: !ImportValue BattlemonAPIServerPrivateKey
+            - Name: BLOCKCHAIN_PROVIDER_API_KEY
+              ValueFrom: !ImportValue BattlemonAPIBlockchainProviderApiKey
           LogConfiguration:
             LogDriver: awslogs
             Options:

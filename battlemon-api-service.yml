@@ -41,7 +41,7 @@ Parameters:
   BattlemonAPIBlockchainProviderUrl:
     Description: Blockchain provider url
     Type: String
-    Default: 'https://consensys-zkevm-goerli-prealpha.infura.io/v3/'
+    Default: 'https://linea-goerli.infura.io/v3/'
 
 Resources:
   BattlemonAPISecurityGroup:
@@ -159,3 +159,23 @@ Outputs:
     Value: !Ref BattlemonAPIGRPCPort
     Export:
       Name: BattlemonAPIGRPCPort
+
+  BattlemonAPIBlockchainProviderUrl:
+    Value: !Ref BattlemonAPIBlockchainProviderUrl
+    Export:
+      Name: BattlemonAPIBlockchainProviderUrl
+
+  BattlemonAPIAccessKeyContractAddress:
+    Value: !Ref BattlemonAPIAccessKeyContractAddress
+    Export:
+      Name: BattlemonAPIAccessKeyContractAddress
+
+  BattlemonAPIGemsContractAddress:
+    Value: !Ref BattlemonAPIGemsContractAddress
+    Export:
+      Name: BattlemonAPIGemsContractAddress
+
+  BattlemonAPIReferralContractAddress:
+    Value: !Ref BattlemonAPIReferralContractAddress
+    Export:
+      Name: BattlemonAPIReferralContractAddress

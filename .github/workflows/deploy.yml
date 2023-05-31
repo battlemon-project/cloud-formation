@@ -62,7 +62,7 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy battlemon-api load-balanacer resources to stack to AWS CloudFormation
+      - name: Deploy battlemon-api load-balancer resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: application-load-balancer-layer-stack

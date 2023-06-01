@@ -18,11 +18,6 @@ Parameters:
     Type: String
     Default: info
 
-  DiscordGuildId:
-    Description: Id of battlemon discord server
-    Type: String
-    Default: 893433519110488064
-
 Resources:
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -89,20 +84,20 @@ Resources:
             - Name: LOG_LEVEL
               Value: !Ref LogLevel
             - Name: DISCORD_GUILD_ID
-              Value: !Ref DiscordGuildId
+              Value: '{{resolve:ssm:BattlemonListener/DiscordGuildId}}'
             - Name: BATTLEMON_GRPC_API_URL
               Value: !Sub
                 - ${Endpoint}:${Port}
                 - Endpoint: !ImportValue BattlemonAPIEndpoint
                   Port: !ImportValue BattlemonAPIGRPCPort
             - Name: BLOCKCHAIN_PROVIDER_URL
-              Value: !ImportValue BattlemonAPIBlockchainProviderUrl
+              Value: '{{resolve:ssm:/BattlemonAPI/BlockchainProviderUrl}}'
             - Name: ACCESS_KEY_CONTRACT_ADDRESS
-              Value: !ImportValue BattlemonAPIAccessKeyContractAddress
+              Value: '{{resolve:ssm:/BattlemonAPI/AccessKeyContractAddress}}'
             - Name: GEMS_CONTRACT_ADDRESS
-              Value: !ImportValue BattlemonAPIGemsContractAddress
+              Value: '{{resolve:ssm:/BattlemonAPI/GemsContractAddress}}'
             - Name: REFERRAL_CONTRACT_ADDRESS
-              Value: !ImportValue BattlemonAPIReferralContractAddress
+              Value: '{{resolve:ssm:/BattlemonAPI/ReferralContractAddress}}'
           Secrets:
             - Name: DATABASE_PASSWORD
               ValueFrom: !ImportValue BattlemonDatabasePassword

@@ -84,7 +84,7 @@ Resources:
             - Name: LOG_LEVEL
               Value: !Ref LogLevel
             - Name: DISCORD_GUILD_ID
-              Value: '{{resolve:ssm:BattlemonListener/DiscordGuildId}}'
+              Value: '{{resolve:ssm:/BattlemonListener/DiscordGuildId}}'
             - Name: BATTLEMON_GRPC_API_URL
               Value: !Sub
                 - ${Endpoint}:${Port}

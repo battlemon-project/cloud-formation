@@ -113,7 +113,7 @@ jobs:
       - name: Deploy battlemon-game-server service resources to stack to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: battlemon-listener-service-layer-stack
+          name: battlemon-game-server-service-layer-stack
           template: battlemon-game-server-service.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM

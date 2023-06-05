@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: Battlemon Listener layer
+Description: Battlemon Game Server layer
 
 Parameters:
   Port:
@@ -9,12 +9,12 @@ Parameters:
     Default: 2567
 
   ECRRepositoryURI:
-    Description: Battlemon listener repository's URI of Amazon Container Registry
+    Description: Battlemon game server repository's URI of Amazon Container Registry
     Type: String
     Default: "987666890397.dkr.ecr.eu-central-1.amazonaws.com/battlemon-game-server:latest"
 
   LogLevel:
-    Description: Log level for battlemon listener service
+    Description: Log level for battlemon game server service
     Type: String
     Default: info
 
@@ -31,12 +31,12 @@ Resources:
       VpcId: !ImportValue BattlemonVpcId
       Tags:
         - Key: Name
-          Value: BattlemonListenerSecurityGroup
+          Value: BattlemonGameServerSecurityGroup
 
   Service:
     Type: AWS::ECS::Service
     Properties:
-      ServiceName: BattlemonListenerService
+      ServiceName: BattlemonGameServerService
       Cluster: !ImportValue BattlemonBackendCluster
       TaskDefinition: !Ref TaskDefinition
       DesiredCount: 1

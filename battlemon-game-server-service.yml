@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Battlemon Listener layer
+
+Parameters:
+  Port:
+    Description: Coliseum port
+    Type: Number
+    Default: 2567
+
+  ECRRepositoryURI:
+    Description: Battlemon listener repository's URI of Amazon Container Registry
+    Type: String
+    Default: "987666890397.dkr.ecr.eu-central-1.amazonaws.com/battlemon-game-server:latest"
+
+  LogLevel:
+    Description: Log level for battlemon listener service
+    Type: String
+    Default: info
+
+Resources:
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable WS on port 2567, but can be overwritten by Port parameter
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref Port
+          ToPort: !Ref Port
+          CidrIp: !ImportValue BattlemonVpcCIDR
+      VpcId: !ImportValue BattlemonVpcId
+      Tags:
+        - Key: Name
+          Value: BattlemonListenerSecurityGroup
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: BattlemonListenerService
+      Cluster: !ImportValue BattlemonBackendCluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 1
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: [ !ImportValue BattlemonPublicSubnet1, !ImportValue BattlemonPublicSubnet2 ]
+          SecurityGroups: [ !Ref SecurityGroup ]
+      Tags:
+        - Key: Name
+          Value: BattlemonGameServerService
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/ecs/battlemon-game-server-backend
+      RetentionInDays: 7
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities: [ FARGATE ]
+      Family: BattlemonGameServer
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !ImportValue BattlemonTaskExecutionRoleArn
+      ContainerDefinitions:
+        - Name: BattlemonGameServer
+          Image: !Ref ECRRepositoryURI
+          Essential: true
+          PortMappings:
+            - ContainerPort: !Ref Port
+              Protocol: tcp
+          Environment:
+            - Name: LOG_LEVEL
+              Value: !Ref LogLevel
+            - Name: BATTLEMON_GRPC_API_URL
+              Value: !Sub
+                - ${Endpoint}:${Port}
+                - Endpoint: !ImportValue BattlemonAPIEndpoint
+                  Port: !ImportValue BattlemonAPIGRPCPort
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref 'AWS::Region'
+              awslogs-stream-prefix: ecs
+      Cpu: 256
+      Memory: 0.5 GB
+      RuntimePlatform:
+        CpuArchitecture: ARM64
+        OperatingSystemFamily: LINUX
+      Tags:
+        - Key: Name
+          Value: BattlemonGameServerTaskDefinition

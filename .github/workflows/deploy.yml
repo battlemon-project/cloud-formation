@@ -54,11 +54,11 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 
-      - name: Deploy SMM parameters to AWS CloudFormation
+      - name: Deploy common values in secrets store to AWS CloudFormation
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
-          name: smm-parameters-layer-stack
-          template: smm-parameters.yml
+          name: common-secrets
+          template: common-secrets.yml
           no-fail-on-empty-changeset: "1"
           capabilities: CAPABILITY_NAMED_IAM
 

@@ -103,14 +103,6 @@ Resources:
               Value: !Ref BattlemonAPILogLevel
             - Name: SERVE_SWAGGER
               Value: !Ref BattlemonAPIServeSwagger
-            - Name: ACCESS_KEY_CONTRACT_ADDRESS
-              Value: '{{resolve:ssm:/BattlemonAPI/AccessKeyContractAddress}}'
-            - Name: GEMS_CONTRACT_ADDRESS
-              Value: '{{resolve:ssm:/BattlemonAPI/GemsContractAddress}}'
-            - Name: REFERRAL_CONTRACT_ADDRESS
-              Value: '{{resolve:ssm:/BattlemonAPI/ReferralContractAddress}}'
-            - Name: BLOCKCHAIN_PROVIDER_URL
-              Value: '{{resolve:ssm:/BattlemonAPI/BlockchainProviderUrl}}'
           Secrets:
             - Name: DATABASE_PASSWORD
               ValueFrom: !ImportValue BattlemonDatabasePassword
@@ -120,6 +112,14 @@ Resources:
               ValueFrom: !ImportValue BattlemonAPIServerPrivateKey
             - Name: BLOCKCHAIN_PROVIDER_API_KEY
               ValueFrom: !ImportValue BattlemonAPIBlockchainProviderApiKey
+            - Name: ACCESS_KEY_CONTRACT_ADDRESS
+              Value: !ImportValue AccessKeyContractAddress
+            - Name: GEMS_CONTRACT_ADDRESS
+              Value: !ImportValue GemsContractAddress
+            - Name: REFERRAL_CONTRACT_ADDRESS
+              Value: !ImportValue ReferralContractAddress
+            - Name: BLOCKCHAIN_PROVIDER_URL
+              Value: !ImportValue BlockchainProviderUrl
           LogConfiguration:
             LogDriver: awslogs
             Options:

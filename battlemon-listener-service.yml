@@ -83,21 +83,11 @@ Resources:
               Value: !ImportValue BattlemonDatabasePort
             - Name: LOG_LEVEL
               Value: !Ref LogLevel
-            - Name: DISCORD_GUILD_ID
-              Value: '{{resolve:ssm:/BattlemonListener/DiscordGuildId}}'
             - Name: BATTLEMON_GRPC_API_URL
               Value: !Sub
                 - ${Endpoint}:${Port}
                 - Endpoint: !ImportValue BattlemonAPIEndpoint
                   Port: !ImportValue BattlemonAPIGRPCPort
-            - Name: BLOCKCHAIN_PROVIDER_URL
-              Value: '{{resolve:ssm:/BattlemonAPI/BlockchainProviderUrl}}'
-            - Name: ACCESS_KEY_CONTRACT_ADDRESS
-              Value: '{{resolve:ssm:/BattlemonAPI/AccessKeyContractAddress}}'
-            - Name: GEMS_CONTRACT_ADDRESS
-              Value: '{{resolve:ssm:/BattlemonAPI/GemsContractAddress}}'
-            - Name: REFERRAL_CONTRACT_ADDRESS
-              Value: '{{resolve:ssm:/BattlemonAPI/ReferralContractAddress}}'
           Secrets:
             - Name: DATABASE_PASSWORD
               ValueFrom: !ImportValue BattlemonDatabasePassword
@@ -107,6 +97,16 @@ Resources:
               ValueFrom: !ImportValue BattlemonAPIServerPrivateKey
             - Name: BLOCKCHAIN_PROVIDER_API_KEY
               ValueFrom: !ImportValue BattlemonAPIBlockchainProviderApiKey
+            - Name: DISCORD_GUILD_ID
+              ValueFrom: !ImportValue DiscordGuildId
+            - Name: BLOCKCHAIN_PROVIDER_URL
+              ValueFrom: !ImportValue BlockchainProviderUrl
+            - Name: ACCESS_KEY_CONTRACT_ADDRESS
+              ValueFrom: !ImportValue AccessKeyContractAddress
+            - Name: GEMS_CONTRACT_ADDRESS
+              ValueFrom: !ImportValue GemsContractAddress
+            - Name: REFERRAL_CONTRACT_ADDRESS
+              ValueFrom: !ImportValue ReferralContractAddress
           LogConfiguration:
             LogDriver: awslogs
             Options:

@@ -113,13 +113,13 @@ Resources:
             - Name: BLOCKCHAIN_PROVIDER_API_KEY
               ValueFrom: !ImportValue BattlemonAPIBlockchainProviderApiKey
             - Name: ACCESS_KEY_CONTRACT_ADDRESS
-              Value: !ImportValue AccessKeyContractAddress
+              ValueFrom: !ImportValue AccessKeyContractAddress
             - Name: GEMS_CONTRACT_ADDRESS
-              Value: !ImportValue GemsContractAddress
+              ValueFrom: !ImportValue GemsContractAddress
             - Name: REFERRAL_CONTRACT_ADDRESS
-              Value: !ImportValue ReferralContractAddress
+              ValueFrom: !ImportValue ReferralContractAddress
             - Name: BLOCKCHAIN_PROVIDER_URL
-              Value: !ImportValue BlockchainProviderUrl
+              ValueFrom: !ImportValue BlockchainProviderUrl
           LogConfiguration:
             LogDriver: awslogs
             Options:

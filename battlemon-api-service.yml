@@ -42,7 +42,6 @@ Resources:
         - Key: Name
           Value: BattlemonAPISecurityGroup
 
-  # BattlemonAPI service
   BattlemonAPIBackendService:
     Type: AWS::ECS::Service
     Properties:

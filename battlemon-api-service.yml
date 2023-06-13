@@ -70,8 +70,8 @@ Resources:
     Properties:
       MaxCapacity: 10
       MinCapacity: 2
-      ResourceId: !Sub
-        - service/${Cluster}/${BattlemonAPIBackendService}
+      ResourceId:
+        - service/${Cluster}/BattlemonAPIBackendService
         - Cluster: !ImportValue BattlemonBackendCluster
       RoleARN: !ImportValue BattlemonAutoScaleRoleArn
       ScalableDimension: ecs:service:DesiredCount
@@ -100,7 +100,7 @@ Resources:
       Dimensions:
         - Name: ServiceName
           Value: !Sub
-            - service/${Cluster}/${BattlemonAPIBackendService}
+            - service/${Cluster}/BattlemonAPIBackendService
             - Cluster: !ImportValue BattlemonBackendCluster
         - Name: ClusterName
           Value: !ImportValue BattlemonBackendCluster

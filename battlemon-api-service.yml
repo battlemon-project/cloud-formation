@@ -74,7 +74,7 @@ Resources:
         - service/${Cluster}/${Service}
         - Cluster: !ImportValue BattlemonBackendCluster
           Service: !ImportValue BattlemonAPIBackendService
-      RoleARN: !ImportValue BattlemonAutoscaleRoleArn
+      RoleARN: !ImportValue BattlemonAutoScaleRoleArn
       ScalableDimension: ecs:service:DesiredCount
       ServiceNamespace: ecs
 

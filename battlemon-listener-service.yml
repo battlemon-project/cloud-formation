@@ -107,6 +107,10 @@ Resources:
               ValueFrom: !ImportValue GemsContractAddress
             - Name: REFERRAL_CONTRACT_ADDRESS
               ValueFrom: !ImportValue ReferralContractAddress
+            - Name: PICK_AXE_CONTRACT_ADDRESS
+              ValueFrom: !ImportValue BattlemonListenerPickAxeContractAddress
+            - Name: GALXE_ACCESS_TOKEN
+              ValueFrom: !ImportValue BattlemonListenerGalxeAccessToken
           LogConfiguration:
             LogDriver: awslogs
             Options:

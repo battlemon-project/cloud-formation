@@ -22,7 +22,7 @@ Resources:
         - Key: Name
           Value: TaskExecutionRole
 
-  BattlemonAutoscaleRole:
+  BattlemonAutoScaleRole:
     Type: AWS::IAM::Role
     Properties:
       RoleName: ServiceAutoScalingRole
@@ -48,7 +48,7 @@ Resources:
                 Resource: '*'
       Tags:
         - Key: Name
-          Value: BattlemonAutoscaleRole
+          Value: BattlemonAutoScaleRole
 
 Outputs:
   TaskExecutionRoleArn:
@@ -56,7 +56,7 @@ Outputs:
     Export:
       Name: BattlemonTaskExecutionRoleArn
 
-  BattlemonAutoscaleRoleArn:
-    Value: !GetAtt BattlemonAutoscaleRole.Arn
+  BattlemonAutoScaleRoleArn:
+    Value: !GetAtt BattlemonAutoScaleRole.Arn
     Export:
-      Name: BattlemonAutoscaleRoleArn
+      Name: BattlemonAutoScaleRoleArn

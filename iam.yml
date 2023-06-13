@@ -25,12 +25,27 @@ Resources:
   BattlemonAutoscaleRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: ServiceAutoScalingRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
-            Action: 'autoscaling:*'
-            Resource: '*'
+            Principal:
+              Service: application-autoscaling.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ServiceAutoScalingPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:DescribeServices
+                  - ecs:UpdateService
+                  - cloudwatch:DeleteAlarms
+                  - cloudwatch:DescribeAlarms
+                  - cloudwatch:PutMetricAlarm
+                Resource: '*'
       Tags:
         - Key: Name
           Value: BattlemonAutoscaleRole

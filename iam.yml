@@ -22,8 +22,31 @@ Resources:
         - Key: Name
           Value: TaskExecutionRole
 
+  BattlemonAutoscaleRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - autoscaling.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2AutoScalingFullAccess
+      Tags:
+        - Key: Name
+          Value: BattlemonAutoscaleRole
+
 Outputs:
   TaskExecutionRoleArn:
     Value: !GetAtt TaskExecutionRole.Arn
     Export:
       Name: BattlemonTaskExecutionRoleArn
+
+  BattlemonAutoscaleRoleArn:
+    Value: !GetAtt BattlemonAutoscaleRole.Arn
+    Export:
+      Name: 'BattlemonAutoscaleRoleArn'

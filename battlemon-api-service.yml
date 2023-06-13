@@ -65,6 +65,56 @@ Resources:
         - Key: Name
           Value: BattlemonAPIBackendService
 
+  BattlemonAPIServiceScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MaxCapacity: 10
+      MinCapacity: 2
+      ResourceId: !Sub
+        - service/${Cluster}/${Service}
+        - Cluster: !ImportValue BattlemonBackendCluster
+          Service: !ImportValue BattlemonAPIBackendService
+      RoleARN: !ImportValue BattlemonAutoscaleRoleArn
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+
+  BattlemonAPIServiceScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: AStepPolicy
+      PolicyType: StepScaling
+      ScalingTargetId: !Ref BattlemonAPIServiceScalingTarget
+      StepScalingPolicyConfiguration:
+        AdjustmentType: PercentChangeInCapacity
+        StepAdjustments:
+          - MetricIntervalLowerBound: 0
+            ScalingAdjustment: 1
+        Cooldown: 60
+        MetricAggregationType: Average
+
+  BattlemonAPICPUAlarmHigh:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Alarm if CPU too high or metric disappears indicating instance is down
+      Namespace: AWS/ECS
+      MetricName: CPUUtilization
+      Dimensions:
+        - Name: ServiceName
+          Value: !Sub
+            - service/${Cluster}/${Service}
+            - Cluster: !ImportValue BattlemonBackendCluster
+              Service: !ImportValue BattlemonAPIBackendService
+        - Name: ClusterName
+          Value: !ImportValue BattlemonBackendCluster
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 2
+      Threshold: 75
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref BattlemonAPIServiceScalingPolicy
+      InsufficientDataActions: [ ]
+
   BattlemonAPIBackendLogGroup:
     Type: AWS::Logs::LogGroup
     Properties:

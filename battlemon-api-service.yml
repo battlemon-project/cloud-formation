@@ -101,9 +101,8 @@ Resources:
       Dimensions:
         - Name: ServiceName
           Value: !Sub
-            - service/${Cluster}/${Service}
+            - service/${Cluster}/${BattlemonAPIBackendService}
             - Cluster: !ImportValue BattlemonBackendCluster
-              Service: !ImportValue BattlemonAPIBackendService
         - Name: ClusterName
           Value: !ImportValue BattlemonBackendCluster
       Statistic: Average

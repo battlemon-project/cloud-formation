@@ -70,7 +70,7 @@ Resources:
     Properties:
       MaxCapacity: 10
       MinCapacity: 2
-      ResourceId:
+      ResourceId: !Sub
         - service/${Cluster}/BattlemonAPIBackendService
         - Cluster: !ImportValue BattlemonBackendCluster
       RoleARN: !ImportValue BattlemonAutoScaleRoleArn

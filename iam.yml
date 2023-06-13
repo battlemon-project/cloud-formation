@@ -40,8 +40,3 @@ Outputs:
     Value: !GetAtt TaskExecutionRole.Arn
     Export:
       Name: BattlemonTaskExecutionRoleArn
-
-  BattlemonAutoscaleRoleArn:
-    Value: !GetAtt BattlemonAutoscaleRole.Arn
-    Export:
-      Name: 'BattlemonAutoscaleRoleArn'

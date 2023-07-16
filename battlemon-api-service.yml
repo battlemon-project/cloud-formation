@@ -50,7 +50,7 @@ Resources:
         - RegistryArn: !ImportValue BattlemonAPIDiscoveryService
       Cluster: !ImportValue BattlemonBackendCluster
       TaskDefinition: !Ref BattlemonApiTaskDefinition
-      DesiredCount: 2
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:
@@ -69,7 +69,7 @@ Resources:
     Type: AWS::ApplicationAutoScaling::ScalableTarget
     Properties:
       MaxCapacity: 10
-      MinCapacity: 2
+      MinCapacity: 1
       ResourceId: !Sub
         - service/${Cluster}/BattlemonAPIBackendService
         - Cluster: !ImportValue BattlemonBackendCluster
